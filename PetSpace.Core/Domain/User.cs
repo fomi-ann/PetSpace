@@ -1,12 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetSpace.Core.Domain
 {
-    internal class User
+    public class User : IdentityUser<Guid>
     {
+        public string UserFirstName { get; set; }
+        public string UserLastName { get; set; }
+        // Email
+        // PasswordHash
+        // PhoneNumber
+        // UserName
+        // EmailConfirmed
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        
+
+        public ICollection<PetOwner> PetOwners { get; set; }
+        public ICollection<Vet> Vets { get; set; }
+        public ICollection<RegisteredPatient> RegisteredPatients { get; set; }
     }
 }

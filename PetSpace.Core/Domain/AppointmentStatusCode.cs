@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetSpace.Core.Domain
 {
-    internal class AppointmentStatusCode
+    public class AppointmentStatusCode
     {
+        [Key]
+        public int AppStatusCodeId { get; set; }
+        public string AppStatusCode { get; set; }
     }
 }

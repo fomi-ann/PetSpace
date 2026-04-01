@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetSpace.Core.Domain
 {
-    internal class RegisteredPatient
+    public class RegisteredPatient
     {
+        [Key]
+        public Guid RegPatientId { get; set; }
+        public bool IsActive { get; set; }
+
+        public Guid UserId { get; set; }
+        public virtual User User { get; set; }
+
+        public Guid ClinicId { get; set; }
+        public virtual Clinic Clinic { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

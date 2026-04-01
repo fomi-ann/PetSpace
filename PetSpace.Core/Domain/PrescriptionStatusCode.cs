@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PetSpace.Core.Domain
 {
-    internal class PerscriptionStatusCode
+    public class PrescriptionStatusCode
     {
+        [Key]
+        public int PrescStatusCodeId { get; set; }
+        public string PrescStatusName { get; set; }
     }
 }
