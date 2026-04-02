@@ -1,11 +1,17 @@
 import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router';
+import Login from './components/Login';
 
 function App() {
   
   return (
-    <>
-      <h1>Hello</h1>
-    </>
+      <Router>
+          <h1>Hello</h1>
+          <Routes>
+              
+              <Route path="/" element={<Login />} />
+          </Routes>
+    </Router>
   )
 }
 

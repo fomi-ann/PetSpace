@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetSpace.Core.Domain;
-using PetSpace.Core;
+
 
 namespace PetSpace.Data
 {
