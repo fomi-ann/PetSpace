@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PetSpace.ApplicationServices.Services;
 using PetSpace.Core.Domain;
+using PetSpace.Core.ServiceInterface;
 using PetSpace.Data;
 using System;
 
@@ -18,6 +20,8 @@ builder.Services.AddIdentity<User, UserRole>(options => {
 })
 .AddEntityFrameworkStores<PetSpaceDbContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IPetSpaceServices, PetSpaceServices>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

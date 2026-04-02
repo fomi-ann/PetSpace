@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetSpace.Core", "PetSpace.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetSpace.Data", "PetSpace.Data\PetSpace.Data.csproj", "{DB1AF22F-259A-4A0F-8096-A477B95B1454}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetSpace.ApplicationServices", "PetSpace.ApplicationServices\PetSpace.ApplicationServices.csproj", "{374FCF1F-D15E-4B72-99A4-8805FBCAB3B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{DB1AF22F-259A-4A0F-8096-A477B95B1454}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB1AF22F-259A-4A0F-8096-A477B95B1454}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB1AF22F-259A-4A0F-8096-A477B95B1454}.Release|Any CPU.Build.0 = Release|Any CPU
+		{374FCF1F-D15E-4B72-99A4-8805FBCAB3B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{374FCF1F-D15E-4B72-99A4-8805FBCAB3B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{374FCF1F-D15E-4B72-99A4-8805FBCAB3B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{374FCF1F-D15E-4B72-99A4-8805FBCAB3B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
