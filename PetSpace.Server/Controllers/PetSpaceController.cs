@@ -6,8 +6,8 @@ using PetSpace.Core.Dto;
 namespace PetSpace.Server.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class PetSpaceController : Controller
+    [Route("api")]
+    public class PetSpaceController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
 
@@ -19,6 +19,7 @@ namespace PetSpace.Server.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
         {
+            if (model == null) return BadRequest("Data is null");
             var user = new User { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
