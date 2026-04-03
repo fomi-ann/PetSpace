@@ -6,6 +6,6 @@ namespace PetSpace.Core.Domain
     {
         [Key]
         public int AppStatusCodeId { get; set; }
-        public string AppStatusCode { get; set; }
+        public string AppStatusCode { get; set; } = string.Empty;
     }
 }

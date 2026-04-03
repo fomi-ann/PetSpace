@@ -6,19 +6,19 @@ namespace PetSpace.Core.Domain
     {
         [Key]
         public Guid VetId { get; set; }
-        public string VetSpecialization { get; set; }
-        public string VetLicence { get; set; }
+        public string VetSpecialization { get; set; } = string.Empty;
+        public string VetLicence { get; set; } = string.Empty;
 
         public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
 
         public Guid ClinicId { get; set; }
-        public virtual Clinic Clinic { get; set; }
+        public virtual Clinic? Clinic { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         
         
-        public virtual ICollection<Appointment> Appointments { get; set; }
+        public virtual ICollection<Appointment>? Appointments { get; set; }
     }
 }

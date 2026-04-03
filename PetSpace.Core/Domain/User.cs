@@ -6,8 +6,8 @@ namespace PetSpace.Core.Domain
 {
     public class User : IdentityUser<Guid>
     {
-        public string UserFirstName { get; set; }
-        public string UserLastName { get; set; }
+        public string UserFirstName { get; set; } = string.Empty;
+        public string UserLastName { get; set; } = string.Empty;
         // Email
         // PasswordHash
         // PhoneNumber
@@ -17,8 +17,8 @@ namespace PetSpace.Core.Domain
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         
 
-        public ICollection<PetOwner> PetOwners { get; set; }
-        public ICollection<Vet> Vets { get; set; }
-        public ICollection<RegisteredPatient> RegisteredPatients { get; set; }
+        public ICollection<PetOwner>? PetOwners { get; set; }
+        public ICollection<Vet>? Vets { get; set; }
+        public ICollection<RegisteredPatient>? RegisteredPatients { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetSpace.Data;
 
@@ -11,9 +12,11 @@ using PetSpace.Data;
 namespace PetSpace.Data.Migrations
 {
     [DbContext(typeof(PetSpaceDbContext))]
-    partial class PetSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260402221802_MakeUserFieldsOptional")]
+    partial class MakeUserFieldsOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace PetSpace.Data.Migrations
                     b.Property<Guid>("PetId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("StatusAppStatusCodeId")
+                    b.Property<int>("StatusAppStatusCodeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -649,7 +652,9 @@ namespace PetSpace.Data.Migrations
 
                     b.HasOne("PetSpace.Core.Domain.AppointmentStatusCode", "Status")
                         .WithMany()
-                        .HasForeignKey("StatusAppStatusCodeId");
+                        .HasForeignKey("StatusAppStatusCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("PetSpace.Core.Domain.Vet", "Vet")
                         .WithMany("Appointments")

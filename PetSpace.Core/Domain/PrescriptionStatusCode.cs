@@ -6,6 +6,6 @@ namespace PetSpace.Core.Domain
     {
         [Key]
         public int PrescStatusCodeId { get; set; }
-        public string PrescStatusName { get; set; }
+        public string PrescStatusName { get; set; } = string.Empty;
     }
 }

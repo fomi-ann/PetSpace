@@ -1,11 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PetSpace.Core.Domain;
 
 
 namespace PetSpace.Data
 {
-    public class PetSpaceDbContext : IdentityDbContext<User, UserRole, Guid>
+    public class PetSpaceDbContext : IdentityDbContext<
+        User, 
+        UserRole, 
+        Guid,
+        IdentityUserClaim<Guid>,
+        IdentityUserRole<Guid>,
+        IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>,
+        IdentityUserToken<Guid>>
     {
         public PetSpaceDbContext(DbContextOptions<PetSpaceDbContext> options) : base(options)
         {
