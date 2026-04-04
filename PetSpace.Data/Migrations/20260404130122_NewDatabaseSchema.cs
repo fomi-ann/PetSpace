@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetSpace.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class NewDatabaseSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -65,24 +65,6 @@ namespace PetSpace.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Clinics",
-                columns: table => new
-                {
-                    ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClinicRegCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClinicAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClinicPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClinicEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Clinics", x => x.ClinicId);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,59 +207,29 @@ namespace PetSpace.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RegisteredPatients",
+                name: "Clinics",
                 columns: table => new
                 {
-                    RegPatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClinicName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicRegCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClinicEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RegisteredPatients", x => x.RegPatientId);
+                    table.PrimaryKey("PK_Clinics", x => x.ClinicId);
                     table.ForeignKey(
-                        name: "FK_RegisteredPatients_AspNetUsers_UserId",
+                        name: "FK_Clinics_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RegisteredPatients_Clinics_ClinicId",
-                        column: x => x.ClinicId,
-                        principalTable: "Clinics",
-                        principalColumn: "ClinicId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vets",
-                columns: table => new
-                {
-                    VetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VetSpecialization = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VetLicence = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vets", x => x.VetId);
-                    table.ForeignKey(
-                        name: "FK_Vets_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Vets_Clinics_ClinicId",
-                        column: x => x.ClinicId,
-                        principalTable: "Clinics",
-                        principalColumn: "ClinicId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -310,6 +262,64 @@ namespace PetSpace.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RegisteredPatients",
+                columns: table => new
+                {
+                    RegPatientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegisteredPatients", x => x.RegPatientId);
+                    table.ForeignKey(
+                        name: "FK_RegisteredPatients_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RegisteredPatients_Clinics_ClinicId",
+                        column: x => x.ClinicId,
+                        principalTable: "Clinics",
+                        principalColumn: "ClinicId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vets",
+                columns: table => new
+                {
+                    VetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VetSpecialization = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VetLicence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsVerified = table.Column<bool>(type: "bit", nullable: false),
+                    VerifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vets", x => x.VetId);
+                    table.ForeignKey(
+                        name: "FK_Vets_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vets_Clinics_ClinicId",
+                        column: x => x.ClinicId,
+                        principalTable: "Clinics",
+                        principalColumn: "ClinicId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Appointments",
                 columns: table => new
                 {
@@ -317,7 +327,6 @@ namespace PetSpace.Data.Migrations
                     AppDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AppReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AppStatusCodeId = table.Column<int>(type: "int", nullable: false),
-                    StatusAppStatusCodeId = table.Column<int>(type: "int", nullable: false),
                     PetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VetId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClinicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -328,8 +337,8 @@ namespace PetSpace.Data.Migrations
                 {
                     table.PrimaryKey("PK_Appointments", x => x.AppId);
                     table.ForeignKey(
-                        name: "FK_Appointments_AppointmentStatusCodes_StatusAppStatusCodeId",
-                        column: x => x.StatusAppStatusCodeId,
+                        name: "FK_Appointments_AppointmentStatusCodes_AppStatusCodeId",
+                        column: x => x.AppStatusCodeId,
                         principalTable: "AppointmentStatusCodes",
                         principalColumn: "AppStatusCodeId",
                         onDelete: ReferentialAction.Cascade);
@@ -343,14 +352,12 @@ namespace PetSpace.Data.Migrations
                         name: "FK_Appointments_Pets_PetId",
                         column: x => x.PetId,
                         principalTable: "Pets",
-                        principalColumn: "PetId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PetId");
                     table.ForeignKey(
                         name: "FK_Appointments_Vets_VetId",
                         column: x => x.VetId,
                         principalTable: "Vets",
-                        principalColumn: "VetId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "VetId");
                 });
 
             migrationBuilder.CreateTable(
@@ -400,7 +407,7 @@ namespace PetSpace.Data.Migrations
                     Duration = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PrescriptionStatusCodeId = table.Column<int>(type: "int", nullable: false),
+                    PrescStatusCodeId = table.Column<int>(type: "int", nullable: false),
                     MedicalRecordId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -415,12 +422,17 @@ namespace PetSpace.Data.Migrations
                         principalColumn: "MedicalRecordId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Prescriptions_PrescriptionStatusCodes_PrescriptionStatusCodeId",
-                        column: x => x.PrescriptionStatusCodeId,
+                        name: "FK_Prescriptions_PrescriptionStatusCodes_PrescStatusCodeId",
+                        column: x => x.PrescStatusCodeId,
                         principalTable: "PrescriptionStatusCodes",
                         principalColumn: "PrescStatusCodeId",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_AppStatusCodeId",
+                table: "Appointments",
+                column: "AppStatusCodeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_ClinicId",
@@ -431,11 +443,6 @@ namespace PetSpace.Data.Migrations
                 name: "IX_Appointments_PetId",
                 table: "Appointments",
                 column: "PetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Appointments_StatusAppStatusCodeId",
-                table: "Appointments",
-                column: "StatusAppStatusCodeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_VetId",
@@ -482,6 +489,12 @@ namespace PetSpace.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Clinics_UserId",
+                table: "Clinics",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicalRecords_AppId",
                 table: "MedicalRecords",
                 column: "AppId");
@@ -512,9 +525,9 @@ namespace PetSpace.Data.Migrations
                 column: "MedicalRecordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Prescriptions_PrescriptionStatusCodeId",
+                name: "IX_Prescriptions_PrescStatusCodeId",
                 table: "Prescriptions",
-                column: "PrescriptionStatusCodeId");
+                column: "PrescStatusCodeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RegisteredPatients_ClinicId",
@@ -534,7 +547,8 @@ namespace PetSpace.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Vets_UserId",
                 table: "Vets",
-                column: "UserId");
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -586,10 +600,10 @@ namespace PetSpace.Data.Migrations
                 name: "Vets");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Clinics");
 
             migrationBuilder.DropTable(
-                name: "Clinics");
+                name: "AspNetUsers");
         }
     }
 }

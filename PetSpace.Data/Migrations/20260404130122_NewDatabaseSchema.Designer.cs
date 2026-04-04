@@ -12,8 +12,8 @@ using PetSpace.Data;
 namespace PetSpace.Data.Migrations
 {
     [DbContext(typeof(PetSpaceDbContext))]
-    [Migration("20260402221802_MakeUserFieldsOptional")]
-    partial class MakeUserFieldsOptional
+    [Migration("20260404130122_NewDatabaseSchema")]
+    partial class NewDatabaseSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,9 +153,6 @@ namespace PetSpace.Data.Migrations
                     b.Property<Guid>("PetId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("StatusAppStatusCodeId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -164,11 +161,11 @@ namespace PetSpace.Data.Migrations
 
                     b.HasKey("AppId");
 
+                    b.HasIndex("AppStatusCodeId");
+
                     b.HasIndex("ClinicId");
 
                     b.HasIndex("PetId");
-
-                    b.HasIndex("StatusAppStatusCodeId");
 
                     b.HasIndex("VetId");
 
@@ -221,10 +218,22 @@ namespace PetSpace.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ClinicId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Clinics");
                 });
@@ -380,7 +389,7 @@ namespace PetSpace.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PrescriptionStatusCodeId")
+                    b.Property<int>("PrescStatusCodeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -390,7 +399,7 @@ namespace PetSpace.Data.Migrations
 
                     b.HasIndex("MedicalRecordId");
 
-                    b.HasIndex("PrescriptionStatusCodeId");
+                    b.HasIndex("PrescStatusCodeId");
 
                     b.ToTable("Prescriptions");
                 });
@@ -562,11 +571,17 @@ namespace PetSpace.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("VetLicence")
                         .IsRequired()
@@ -580,7 +595,8 @@ namespace PetSpace.Data.Migrations
 
                     b.HasIndex("ClinicId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Vets");
                 });
@@ -638,6 +654,12 @@ namespace PetSpace.Data.Migrations
 
             modelBuilder.Entity("PetSpace.Core.Domain.Appointment", b =>
                 {
+                    b.HasOne("PetSpace.Core.Domain.AppointmentStatusCode", "Status")
+                        .WithMany()
+                        .HasForeignKey("AppStatusCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("PetSpace.Core.Domain.Clinic", "Clinic")
                         .WithMany("Appointments")
                         .HasForeignKey("ClinicId")
@@ -647,19 +669,13 @@ namespace PetSpace.Data.Migrations
                     b.HasOne("PetSpace.Core.Domain.Pet", "Pet")
                         .WithMany("Appointments")
                         .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PetSpace.Core.Domain.AppointmentStatusCode", "Status")
-                        .WithMany()
-                        .HasForeignKey("StatusAppStatusCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("PetSpace.Core.Domain.Vet", "Vet")
                         .WithMany("Appointments")
                         .HasForeignKey("VetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Clinic");
@@ -669,6 +685,17 @@ namespace PetSpace.Data.Migrations
                     b.Navigation("Status");
 
                     b.Navigation("Vet");
+                });
+
+            modelBuilder.Entity("PetSpace.Core.Domain.Clinic", b =>
+                {
+                    b.HasOne("PetSpace.Core.Domain.User", "User")
+                        .WithOne("Clinic")
+                        .HasForeignKey("PetSpace.Core.Domain.Clinic", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PetSpace.Core.Domain.MedicalRecord", b =>
@@ -727,7 +754,7 @@ namespace PetSpace.Data.Migrations
 
                     b.HasOne("PetSpace.Core.Domain.PrescriptionStatusCode", "Status")
                         .WithMany()
-                        .HasForeignKey("PrescriptionStatusCodeId")
+                        .HasForeignKey("PrescStatusCodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -739,15 +766,15 @@ namespace PetSpace.Data.Migrations
             modelBuilder.Entity("PetSpace.Core.Domain.RegisteredPatient", b =>
                 {
                     b.HasOne("PetSpace.Core.Domain.Clinic", "Clinic")
-                        .WithMany()
+                        .WithMany("RegisteredPatients")
                         .HasForeignKey("ClinicId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PetSpace.Core.Domain.User", "User")
                         .WithMany("RegisteredPatients")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Clinic");
@@ -760,12 +787,12 @@ namespace PetSpace.Data.Migrations
                     b.HasOne("PetSpace.Core.Domain.Clinic", "Clinic")
                         .WithMany("Vets")
                         .HasForeignKey("ClinicId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PetSpace.Core.Domain.User", "User")
-                        .WithMany("Vets")
-                        .HasForeignKey("UserId")
+                        .WithOne("Vet")
+                        .HasForeignKey("PetSpace.Core.Domain.Vet", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -777,6 +804,8 @@ namespace PetSpace.Data.Migrations
             modelBuilder.Entity("PetSpace.Core.Domain.Clinic", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("RegisteredPatients");
 
                     b.Navigation("Vets");
                 });
@@ -797,11 +826,13 @@ namespace PetSpace.Data.Migrations
 
             modelBuilder.Entity("PetSpace.Core.Domain.User", b =>
                 {
+                    b.Navigation("Clinic");
+
                     b.Navigation("PetOwners");
 
                     b.Navigation("RegisteredPatients");
 
-                    b.Navigation("Vets");
+                    b.Navigation("Vet");
                 });
 
             modelBuilder.Entity("PetSpace.Core.Domain.Vet", b =>

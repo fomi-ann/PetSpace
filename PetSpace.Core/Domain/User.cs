@@ -18,7 +18,8 @@ namespace PetSpace.Core.Domain
         
 
         public ICollection<PetOwner>? PetOwners { get; set; }
-        public ICollection<Vet>? Vets { get; set; }
+        public virtual Vet? Vet { get; set; }
         public ICollection<RegisteredPatient>? RegisteredPatients { get; set; }
+        public virtual Clinic? Clinic { get; set; }
     }
 }

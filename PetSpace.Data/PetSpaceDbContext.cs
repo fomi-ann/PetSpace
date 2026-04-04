@@ -7,8 +7,8 @@ using PetSpace.Core.Domain;
 namespace PetSpace.Data
 {
     public class PetSpaceDbContext : IdentityDbContext<
-        User, 
-        UserRole, 
+        User,
+        UserRole,
         Guid,
         IdentityUserClaim<Guid>,
         IdentityUserRole<Guid>,
@@ -50,12 +50,14 @@ namespace PetSpace.Data
             modelBuilder.Entity<RegisteredPatient>()
                 .HasOne(rp => rp.User)
                 .WithMany(u => u.RegisteredPatients)
-                .HasForeignKey(rp => rp.UserId);
+                .HasForeignKey(rp => rp.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<RegisteredPatient>()
                 .HasOne(rp => rp.Clinic)
-                .WithMany()
-                .HasForeignKey(rp => rp.ClinicId);
+                .WithMany(c => c.RegisteredPatients)
+                .HasForeignKey(rp => rp.ClinicId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Clinic)
@@ -63,12 +65,48 @@ namespace PetSpace.Data
                 .HasForeignKey(a => a.ClinicId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Vet)
+                .WithMany(v => v.Appointments)
+                .HasForeignKey(a => a.VetId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Pet)
+                .WithMany(p => p.Appointments)
+                .HasForeignKey(a => a.PetId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // MedicalRecord to Appointment
             modelBuilder.Entity<MedicalRecord>()
                 .HasOne(mr => mr.Appointment)
                 .WithMany()
                 .HasForeignKey(mr => mr.AppId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Vet)
+                .WithOne(v => v.User)
+                .HasForeignKey<Vet>(v => v.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Clinic)
+                .WithOne(c => c.User)
+                .HasForeignKey<Clinic>(c => c.UserId);
+
+            modelBuilder.Entity<Vet>()
+                .HasOne(v => v.Clinic)
+                .WithMany(c => c.Vets)
+                .HasForeignKey(v => v.ClinicId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Pet>()
+                .Property(p => p.PetWeight)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<MedicalRecord>()
+                .Property(mr => mr.PetWeight)
+                .HasColumnType("decimal(18,2)");
         }
 
     }

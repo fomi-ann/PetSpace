@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,14 @@ namespace PetSpace.Core.Domain
         public string Comment { get; set; } = string.Empty;
         public DateTime ExpiryDate { get; set; }
 
-        public int PrescriptionStatusCodeId { get; set; }
+        public int PrescStatusCodeId { get; set; }
+
+        [ForeignKey("PrescStatusCodeId")]
         public virtual PrescriptionStatusCode? Status { get; set; }
 
         public Guid MedicalRecordId { get; set; }
+
+        [ForeignKey("MedicalRecordId")]
         public virtual MedicalRecord? MedicalRecord { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
