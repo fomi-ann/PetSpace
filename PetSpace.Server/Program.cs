@@ -42,6 +42,21 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var roleManager = services.GetRequiredService<RoleManager<UserRole>>();
+        await SeedRoles(roleManager);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding roles.");
+    }
+}
+
 app.UseDefaultFiles();
 app.MapStaticAssets();
 
@@ -56,3 +71,18 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task SeedRoles(RoleManager<UserRole> roleManager)
+{
+    string[] roleNames = { "Admin", "Clinic", "Vet", "PetOwner" };
+
+    foreach (var roleName in roleNames)
+    {
+        var roleExist = await roleManager.RoleExistsAsync(roleName);
+
+        if (!roleExist)
+        {
+            await roleManager.CreateAsync(new UserRole { Name = roleName });
+        }
+    }
+}

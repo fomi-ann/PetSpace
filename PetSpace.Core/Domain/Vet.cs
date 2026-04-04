@@ -15,7 +15,7 @@ namespace PetSpace.Core.Domain
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
 
-        public Guid ClinicId { get; set; }
+        public Guid? ClinicId { get; set; }
         [ForeignKey("ClinicId")]
         public virtual Clinic? Clinic { get; set; }
 

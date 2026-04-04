@@ -8,6 +8,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [role, setRole] = useState('PetOwner');
 
 
     const handleSubmit = async (e) => {
@@ -23,7 +24,7 @@ const Register = () => {
             const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password, role })
             });
 
             if (response.ok) {
@@ -88,6 +89,54 @@ const Register = () => {
                         </span>
                     </div>
 
+                    <div className="mb-4 text-start">
+                        <label className="form-label small text-muted d-block mb-2">Register as:</label>
+
+                        <div className="form-check mb-2">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="role"
+                                id="owner"
+                                value="PetOwner"
+                                checked={role === 'PetOwner'}
+                                onChange={(e) => setRole(e.target.value)}
+                            />
+                            <label className="form-check-label small" htmlFor="owner">
+                                Pet Owner
+                            </label>
+                        </div>
+
+                        <div className="form-check mb-2">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="role"
+                                id="vet"
+                                value="Vet"
+                                checked={role === 'Vet'}
+                                onChange={(e) => setRole(e.target.value)}
+                            />
+                            <label className="form-check-label small" htmlFor="vet">
+                                Veterinarian
+                            </label>
+                        </div>
+
+                        <div className="form-check mb-2">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="role"
+                                id="clinic"
+                                value="Clinic"
+                                checked={role === 'Clinic'}
+                                onChange={(e) => setRole(e.target.value)}
+                            />
+                            <label className="form-check-label small" htmlFor="clinic">
+                                Clinic Representative
+                            </label>
+                        </div>
+                    </div>
 
                     <div className="d-grid mb-4">
                         <button type="submit" className="btn btn-primary py-2">Create Account</button>

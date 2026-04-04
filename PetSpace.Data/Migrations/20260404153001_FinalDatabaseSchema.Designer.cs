@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PetSpace.Data;
 
@@ -11,9 +12,11 @@ using PetSpace.Data;
 namespace PetSpace.Data.Migrations
 {
     [DbContext(typeof(PetSpaceDbContext))]
-    partial class PetSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260404153001_FinalDatabaseSchema")]
+    partial class FinalDatabaseSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
