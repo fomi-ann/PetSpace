@@ -7,6 +7,7 @@
     <SpaRoot>..\petspace.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:64189</SpaProxyServerUrl>
+    <UserSecretsId>510ee673-41f0-4085-b1c2-5045436bf1df</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

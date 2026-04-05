@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PetSpace.Core.Domain;
 using PetSpace.Core.Dto;
+using PetSpace.Core.ServiceInterface;
 using PetSpace.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace PetSpace.Server.Controllers
 {
@@ -11,42 +16,34 @@ namespace PetSpace.Server.Controllers
     [Route("api")]
     public class PetSpaceController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly PetSpaceDbContext _context;
+        private readonly IPetSpaceServices _petSpaceService;
 
-        public PetSpaceController(UserManager<User> userManager, PetSpaceDbContext context)
+        public PetSpaceController(
+            IPetSpaceServices petSpaceService
+            )
         {
-            _userManager = userManager;
-            _context = context;
+            _petSpaceService = petSpaceService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
         {
-            if (model == null) return BadRequest("Data is null");
-            var user = new User { UserName = model.Email, Email = model.Email };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _petSpaceService.RegisterUserAsync(model);
+            return result.Succeeded ? Ok() : BadRequest(result.Errors);
+        }
 
-            if (result.Succeeded)
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        {
+            var result = await _petSpaceService.LoginAsync(model);
+
+            if (result == null)
             {
-                await _userManager.AddToRoleAsync(user, model.Role);
-
-                if (model.Role == "Clinic")
-                {
-                    _context.Clinics.Add(new Clinic { UserId = user.Id, IsVerified = false });
-                }
-                else if (model.Role == "Vet")
-                {
-                    _context.Vets.Add(new Vet { UserId = user.Id, IsVerified = false });
-                }
-
-                await _context.SaveChangesAsync();
-
-                return Ok(new { message = "OK" });
+                return Unauthorized(new { message = "Invalid email or password" });
             }
 
-            return BadRequest(result.Errors);
+            return Ok(result);
         }
     }
-
 }

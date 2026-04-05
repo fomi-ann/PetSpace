@@ -12,6 +12,7 @@ function App() {
               
               <Route path="/" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<div>Profile page placeholder</div>} />
           </Routes>
     </Router>
   )
