@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router';
 import Login from './components/Login';
 import Register from './components/Register';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   
@@ -12,7 +13,7 @@ function App() {
               
               <Route path="/" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/profile" element={<div>Profile page placeholder</div>} />
+              <Route path="/profile" element={<ProfilePage />} />
           </Routes>
     </Router>
   )

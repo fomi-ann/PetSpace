@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PetSpace.Core.Domain;
@@ -46,7 +47,7 @@ namespace PetSpace.ApplicationServices.Services
 
                 if (dto.Role == "Vet") _context.Vets.Add(new Vet { UserId = user.Id });
                 if (dto.Role == "Clinic") _context.Clinics.Add(new Clinic { UserId = user.Id });
-                if (dto.Role == "PetOwner") _context.PetOwners.Add(new PetOwner { UserId = user.Id });
+                //if (dto.Role == "PetOwner") _context.PetOwners.Add(new PetOwner { UserId = user.Id });
 
                 await _context.SaveChangesAsync();
             }
@@ -64,11 +65,11 @@ namespace PetSpace.ApplicationServices.Services
                 var userRoles = await _userManager.GetRolesAsync(user);
 
                 var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Email!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        };
+                {
+                    new Claim(ClaimTypes.Name, user.Email!),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
                 foreach (var role in userRoles)
                 {
@@ -95,6 +96,39 @@ namespace PetSpace.ApplicationServices.Services
             }
 
             return null;
+        }
+
+        public async Task<object?> GetUserProfileAsync(string userId, string role)
+        {
+            var userGuid = Guid.Parse(userId);
+
+            if (role == "PetOwner")
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+
+                if (user == null) return null;
+
+                return new
+                {
+                    userFirstName = user.UserFirstName,
+                    userLastName = user.UserLastName,
+                    phoneNumber = user.PhoneNumber,
+                };
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateUserProfileAsync(string userId, UserUpdateDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.UserFirstName = dto.FirstName;
+            user.UserLastName = dto.LastName;
+            user.PhoneNumber = dto.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
     }
 }

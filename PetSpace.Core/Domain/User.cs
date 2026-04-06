@@ -15,7 +15,7 @@ namespace PetSpace.Core.Domain
         // EmailConfirmed
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-        
+
 
         public ICollection<PetOwner>? PetOwners { get; set; }
         public virtual Vet? Vet { get; set; }

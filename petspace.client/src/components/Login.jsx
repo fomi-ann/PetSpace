@@ -23,7 +23,7 @@ const Login = () => {
 
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userRole', data.role);
-                console.log("TOKEEEEEN", data.token);
+                // console.log("TOKEEEEEN", data.token);
                 navigate('/profile');
             } else {
                 setError("Invalid email or password");
@@ -49,7 +49,7 @@ const Login = () => {
                         <input
                             type="email"
                             className="form-control bg-transparent border-end-0"
-                            placeholder="Emsil"
+                            placeholder="Email"
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
