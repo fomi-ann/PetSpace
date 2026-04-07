@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using PetSpace.Core.Domain;
 using PetSpace.Core.Dto;
 using PetSpace.Core.ServiceInterface;
-using PetSpace.Data;
-using System.IdentityModel.Tokens.Jwt;
+
 using System.Security.Claims;
-using System.Text;
+
 
 namespace PetSpace.Server.Controllers
 {
@@ -51,17 +46,14 @@ namespace PetSpace.Server.Controllers
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var role = User.FindFirstValue(ClaimTypes.Role);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null) return Unauthorized();
 
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
-            {
-                return Unauthorized();
-            }
+            var userGuid = Guid.Parse(userIdClaim);
 
-            var profile = await _petSpaceService.GetUserProfileAsync(userId, role);
+            var profile = await _petSpaceService.GetUserProfileAsync(userGuid);
 
-            if (profile == null) return NotFound("Profile not found");
+            if (profile == null) return NotFound("Profile not found.");
 
             return Ok(profile);
         }
@@ -70,12 +62,12 @@ namespace PetSpace.Server.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UserUpdateDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
                 return Unauthorized();
 
-            var result = await _petSpaceService.UpdateUserProfileAsync(userId, dto);
+            var userGuid = Guid.Parse(userIdClaim);
+            var result = await _petSpaceService.UpdateUserProfileAsync(userGuid, dto);
 
             if (!result)
                 return BadRequest("Failed to update profile");

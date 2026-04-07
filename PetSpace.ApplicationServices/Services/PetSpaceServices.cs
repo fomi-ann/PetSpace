@@ -98,37 +98,97 @@ namespace PetSpace.ApplicationServices.Services
             return null;
         }
 
-        public async Task<object?> GetUserProfileAsync(string userId, string role)
+        public async Task<object?> GetUserProfileAsync(Guid userId)
         {
-            var userGuid = Guid.Parse(userId);
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return null;
 
-            if (role == "PetOwner")
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? "PetOwner";
+
+            var baseData = new
             {
-                var user = await _userManager.FindByIdAsync(userId);
+                userFirstName = user.UserFirstName,
+                userLastName = user.UserLastName,
+                phoneNumber = user.PhoneNumber,
+                email = user.Email,
+                role = role
+            };
 
-                if (user == null) return null;
-
+            if (role == "Vet")
+            {
+                var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == userId);
                 return new
                 {
-                    userFirstName = user.UserFirstName,
-                    userLastName = user.UserLastName,
-                    phoneNumber = user.PhoneNumber,
+                    baseData.userFirstName,
+                    baseData.userLastName,
+                    baseData.phoneNumber,
+                    baseData.email,
+                    specialization = vet?.VetSpecialization ?? "",
+                    licence = vet?.VetLicence ?? "",
+                    isVerified = vet?.IsVerified ?? false
                 };
             }
-            return null;
+
+            if (role == "Clinic")
+            {
+                var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.UserId == userId);
+                return new
+                {
+                    baseData.userFirstName,
+                    baseData.userLastName,
+                    baseData.phoneNumber,
+                    baseData.email,
+                    clinicName = clinic?.ClinicName ?? "",
+                    address = clinic?.ClinicAddress ?? "",
+                    phone = clinic?.ClinicPhone ?? "",
+                    isVerified = clinic?.IsVerified ?? false
+                };
+            }
+
+            return baseData;
         }
 
-        public async Task<bool> UpdateUserProfileAsync(string userId, UserUpdateDto dto)
+
+        public async Task<bool> UpdateUserProfileAsync(Guid userId, UserUpdateDto dto)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return false;
+
 
             user.UserFirstName = dto.FirstName;
             user.UserLastName = dto.LastName;
             user.PhoneNumber = dto.PhoneNumber;
 
             var result = await _userManager.UpdateAsync(user);
-            return result.Succeeded;
+            if (!result.Succeeded) return false;
+
+ 
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault();
+
+            if (role == "Vet")
+            {
+                var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == userId);
+                if (vet != null)
+                {
+                    vet.VetSpecialization = dto.VetSpecialization;
+                    vet.VetLicence = dto.VetLicence;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else if (role == "Clinic")
+            {
+                var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.UserId == userId);
+                if (clinic != null)
+                {
+                    clinic.ClinicName = dto.ClinicName;
+                    clinic.ClinicAddress = dto.ClinicAddress;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return true;
         }
     }
 }

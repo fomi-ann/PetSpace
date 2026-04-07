@@ -11,5 +11,12 @@ namespace PetSpace.Core.Dto
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
+
+        public string? ClinicName { get; set; }
+        public string? ClinicAddress { get; set; }
+        public string? ClinicPhone { get; set; }
+
+        public string? VetSpecialization { get; set; }
+        public string? VetLicence { get; set; }
     }
 }
