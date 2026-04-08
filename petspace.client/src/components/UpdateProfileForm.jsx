@@ -1,52 +1,51 @@
-﻿import React, { useState } from 'react';
+﻿import { useState } from 'react';
 
-const UserUpdateForm = ({ initialData, onSave }) => {
-    const [formData, setFormData] = useState({
-        firstName: initialData.userFirstName || '',
-        lastName: initialData.userLastName || '',
-        phoneNumber: initialData.phoneNumber || ''
-    });
+const UpdateProfileForm = ({ fields, profile, onSave }) => {
+    const [formData, setFormData] = useState(() => ({
+        firstName: profile?.userFirstName || '',
+        lastName: profile?.userLastName || '',
+        phoneNumber: profile?.phoneNumber || '',
+        clinicName: profile?.clinicName || '',
+        clinicAddress: profile?.address || '',
+        clinicPhone: profile?.phone || '',
+        vetSpecialization: profile?.specialization || '',
+        vetLicence: profile?.licence || ''
+    }));
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSave(formData);
     };
 
     return (
+        <form onSubmit={handleSubmit}>
+            {fields.map(field => (
+                <div className="mb-3" key={field.name}>
+                    <label className="form-label">{field.label}</label>
+                    <input
+                        type="text"
+                        name={field.name}
+                        className="form-control"
+                        placeholder={field.placeholder || ''}
+                        value={formData[field.name] || ''}
+                        onChange={handleChange}
+                    />
+                </div>
+            ))}
 
-
-        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }}>
-            <div className="mb-3">
-                <label className="form-label">First Name</label>
-                <input
-                    name="firstName"
-                    className="form-control"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Last Name</label>
-                <input
-                    name="lastName"
-                    className="form-control"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Phone Number</label>
-                <input
-                    name="phoneNumber"
-                    className="form-control"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                />
-            </div>
-            <button type="submit" className="btn btn-primary w-100">Save Changes</button>
-            </form>
-
+            <button type="submit" className="btn btn-primary w-100">
+                Save Changes
+            </button>
+        </form>
     );
 };
 
-export default UserUpdateForm;
+export default UpdateProfileForm;

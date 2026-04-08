@@ -16,24 +16,31 @@ const ProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 const response = await fetch('/api/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('PROFILE DATA:', data);
                     setProfile(data);
                 } else {
                     setError('Profile not found.');
                 }
-
             } catch (err) {
-                setError('Could not connect to the server.', err);
+                console.error('Profile fetch error:', err);
+                setError('Could not connect to the server.');
             } finally {
                 setLoading(false);
             }
         };
 
-        if (token) fetchProfile();
+        if (!token) {
+            setError('No token found.');
+            setLoading(false);
+            return;
+        }
+
+        fetchProfile();
     }, [token]);
 
 
@@ -42,27 +49,31 @@ const ProfilePage = () => {
             const response = await fetch('/api/profile', {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(updatedData)
             });
 
             if (response.ok) {
-                alert("Profile updated successfully!");
+                alert('Profile updated successfully!');
 
                 setProfile(prev => ({
                     ...prev,
                     userFirstName: updatedData.firstName,
                     userLastName: updatedData.lastName,
                     phoneNumber: updatedData.phoneNumber,
-
+                    specialization: updatedData.specialization,
+                    licence: updatedData.licence,
+                    clinicName: updatedData.clinicName,
+                    address: updatedData.address,
+                    phone: updatedData.phone
                 }));
             } else {
-                alert("Failed to update profile.");
+                alert('Failed to update profile.');
             }
         } catch (err) {
-            console.error("Update error:", err);
+            console.error('Update error:', err);
         }
     };
 
@@ -73,16 +84,17 @@ const ProfilePage = () => {
             case 'Vet':
                 return [
                     ...common,
-                    { name: 'vetSpecialization', label: 'Specialization', icon: 'patch-check' }
+                    { name: 'specialization', label: 'Specialization', icon: 'patch-check' },
+                    { name: 'licence', label: 'Licence', icon: 'card-text' }
                 ];
+
             case 'Clinic':
                 return [
                     { name: 'clinicName', label: 'Clinic', icon: 'hospital' },
-                    { name: 'clinicAddress', label: 'Address', icon: 'geo-alt' },
-                    { name: 'clinicCode', label: 'Clinic Code', icon: 'hash' },
+                    { name: 'address', label: 'Address', icon: 'geo-alt' },
+                    { name: 'phone', label: 'Clinic Phone', icon: 'telephone' },
                     ...common
                 ];
-
 
             default:
                 return common;
@@ -98,18 +110,21 @@ const ProfilePage = () => {
         ];
 
         switch (role) {
-
             case 'Vet':
                 return [
                     ...common,
-                    { name: 'vetSpecialization', label: 'Specialization' }
+                    { name: 'specialization', label: 'Specialization', placeholder: 'Enter specialization' },
+                    { name: 'licence', label: 'Licence', placeholder: 'Enter licence' }
                 ];
+
             case 'Clinic':
                 return [
-                    { name: 'clinicName', label: 'Clinic Name' },
-                    { name: 'clinicAddress', label: 'Address' },
-                    ...common
+                    ...common,
+                    { name: 'clinicName', label: 'Clinic Name', placeholder: 'Enter clinic name' },
+                    { name: 'address', label: 'Address', placeholder: 'Enter address' },
+                    { name: 'phone', label: 'Clinic Phone', placeholder: 'Enter clinic phone' }
                 ];
+
             default:
                 return common;
         }
@@ -140,12 +155,14 @@ const ProfilePage = () => {
                             <UpdateProfileForm
                                 fields={fieldsConfig}
                                 initialData={{
-                                    firstName: profile.userFirstName,
-                                    lastName: profile.userLastName,
-                                    phoneNumber: profile.phoneNumber,
-                                    clinicName: profile.clinicName,
-                                    clinicAddress: profile.clinicAddress,
-                                    vetSpecialization: profile.vetSpecialization
+                                    firstName: profile.userFirstName || '',
+                                    lastName: profile.userLastName || '',
+                                    phoneNumber: profile.phoneNumber || '',
+                                    clinicName: profile.clinicName || '',
+                                    address: profile.address || '',
+                                    phone: profile.phone || '',
+                                    specialization: profile.specialization || '',
+                                    licence: profile.licence || ''
                                 }}
                                 onSave={handleSave}
                             />

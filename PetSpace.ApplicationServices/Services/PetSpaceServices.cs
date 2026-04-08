@@ -112,37 +112,49 @@ namespace PetSpace.ApplicationServices.Services
                 userLastName = user.UserLastName,
                 phoneNumber = user.PhoneNumber,
                 email = user.Email,
-                role = role
+                role
             };
 
             if (role == "Vet")
             {
-                var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == userId);
+                var vet = await _context.Vets
+                    .Include(v => v.User)
+                    .FirstOrDefaultAsync(v => v.UserId == userId);
+
+                if (vet == null) return baseData;
+
                 return new
                 {
                     baseData.userFirstName,
                     baseData.userLastName,
                     baseData.phoneNumber,
                     baseData.email,
-                    specialization = vet?.VetSpecialization ?? "",
-                    licence = vet?.VetLicence ?? "",
-                    isVerified = vet?.IsVerified ?? false
+                    baseData.role,
+                    specialization = vet.VetSpecialization,
+                    licence = vet.VetLicence,
+                    isVerified = vet.IsVerified
                 };
             }
 
             if (role == "Clinic")
             {
-                var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.UserId == userId);
+                var clinic = await _context.Clinics
+                    .Include(c => c.User)
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+
+                if (clinic == null) return baseData;
+
                 return new
                 {
                     baseData.userFirstName,
                     baseData.userLastName,
                     baseData.phoneNumber,
                     baseData.email,
-                    clinicName = clinic?.ClinicName ?? "",
-                    address = clinic?.ClinicAddress ?? "",
-                    phone = clinic?.ClinicPhone ?? "",
-                    isVerified = clinic?.IsVerified ?? false
+                    baseData.role,
+                    clinicName = clinic.ClinicName,
+                    address = clinic.ClinicAddress,
+                    phone = clinic.ClinicPhone,
+                    isVerified = clinic.IsVerified
                 };
             }
 
@@ -160,10 +172,10 @@ namespace PetSpace.ApplicationServices.Services
             user.UserLastName = dto.LastName;
             user.PhoneNumber = dto.PhoneNumber;
 
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded) return false;
+            var userResult = await _userManager.UpdateAsync(user);
+            if (!userResult.Succeeded) return false;
 
- 
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault();
 
@@ -172,9 +184,9 @@ namespace PetSpace.ApplicationServices.Services
                 var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == userId);
                 if (vet != null)
                 {
-                    vet.VetSpecialization = dto.VetSpecialization;
-                    vet.VetLicence = dto.VetLicence;
-                    await _context.SaveChangesAsync();
+                    vet.VetSpecialization = dto.VetSpecialization ?? vet.VetSpecialization;
+                    vet.VetLicence = dto.VetLicence ?? vet.VetLicence;
+                    vet.UpdatedAt = DateTime.UtcNow;
                 }
             }
             else if (role == "Clinic")
@@ -182,12 +194,14 @@ namespace PetSpace.ApplicationServices.Services
                 var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.UserId == userId);
                 if (clinic != null)
                 {
-                    clinic.ClinicName = dto.ClinicName;
-                    clinic.ClinicAddress = dto.ClinicAddress;
-                    await _context.SaveChangesAsync();
+                    clinic.ClinicName = dto.ClinicName ?? clinic.ClinicName;
+                    clinic.ClinicAddress = dto.ClinicAddress ?? clinic.ClinicAddress;
+                    clinic.ClinicPhone = dto.ClinicPhone ?? clinic.ClinicPhone;
+
+                    clinic.UpdatedAt = DateTime.UtcNow;
                 }
             }
-
+            await _context.SaveChangesAsync();
             return true;
         }
     }
