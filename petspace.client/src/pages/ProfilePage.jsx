@@ -23,8 +23,10 @@ const ProfilePage = () => {
                     const data = await response.json();
                     console.log('PROFILE DATA:', data);
                     setProfile(data);
+                    localStorage.setItem('userFirstName', data.userFirstName || '');
                 } else {
                     setError('Profile not found.');
+                
                 }
             } catch (err) {
                 console.error('Profile fetch error:', err);
