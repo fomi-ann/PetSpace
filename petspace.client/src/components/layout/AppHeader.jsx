@@ -23,7 +23,7 @@ const AppHeader = ({ onMenuClick, userName, onLogout }) => {
                     style={{ width: '220px' }}
                 >
                     <span className="text-muted small mb-0">
-                        {userName ? `, "Hello, " ${userName}` : 'Please update your profile'}
+                        {userName ? `Hello,  ${userName}` : 'Please update your profile'}
                     </span>
 
                     <button

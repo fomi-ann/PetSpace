@@ -41,7 +41,7 @@ const Register = () => {
     };
 
     return (
-        <div className="container d-flex align-items-center justify-content-center">
+        <div className="container d-flex align-items-center justify-content-center mt-5">
             <div className="card p-5" style={{ width: '420px' }}>
                 <h2 className="text-center mb-5">Register</h2>
 
