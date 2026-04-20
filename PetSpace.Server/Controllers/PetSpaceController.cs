@@ -74,5 +74,53 @@ namespace PetSpace.Server.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("pets")]
+        public async Task<IActionResult> GetPets()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var pets = await _petSpaceService.GetUserPetsAsync(userGuid);
+
+            return Ok(pets);
+        }
+
+        [Authorize]
+        [HttpPost("pets")]
+        public async Task<IActionResult> AddPet([FromBody] PetDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var result = await _petSpaceService.AddPetAsync(userGuid, dto);
+
+            if (!result)
+                return BadRequest("Failed to add pet.");
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete("pets/{petId}")]
+        public async Task<IActionResult> DeletePet(Guid petId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var result = await _petSpaceService.DeletePetAsync(userGuid, petId);
+
+            if (!result)
+                return BadRequest("Failed to delete pet.");
+
+            return Ok();
+        }
     }
 }

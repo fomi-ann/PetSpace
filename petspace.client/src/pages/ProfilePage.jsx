@@ -2,15 +2,34 @@ import React, { useEffect, useState } from 'react';
 import UserIdentityCard from '../components/UserIdentityCard';
 import UpdateProfileForm from '../components/UpdateProfileForm';
 
+import AddPetForm from '../components/AddPetForm';
+import PetList from '../components/PetList';
+
 const ProfilePage = () => {
 
 
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [pets, setPets] = useState([]);
 
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
+
+    const fetchPets = async () => {
+        try {
+            const response = await fetch('/api/pets', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setPets(data);
+            }
+        } catch (err) {
+            console.error('Pets fetch error:', err);
+        }
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -42,7 +61,13 @@ const ProfilePage = () => {
             return;
         }
 
-        fetchProfile();
+        const loadData = async () => {
+            await fetchProfile();
+            await fetchPets();
+        };
+
+        loadData();
+
     }, [token]);
 
 
@@ -137,6 +162,47 @@ const ProfilePage = () => {
     const displayConfig = getDisplayConfig(role);
     const fieldsConfig = getFieldsConfig(role);
 
+
+    const handleAddPet = async (petData) => {
+        try {
+            const response = await fetch('/api/pets', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(petData)
+            });
+
+            if (response.ok) {
+                await fetchPets();
+            } else {
+                alert('Failed to add pet.');
+            }
+        } catch (err) {
+            console.error('Add pet error:', err);
+        }
+    };
+
+    const handleDeletePet = async (petId) => {
+        try {
+            const response = await fetch(`/api/pets/${petId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setPets(prev => prev.filter(pet => pet.petId !== petId));
+            } else {
+                alert('Failed to delete pet.');
+            }
+        } catch (err) {
+            console.error('Delete pet error:', err);
+        }
+    };
+
     return (
         <div className="container mt-5" style={{ maxWidth: '800px' }}>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -175,10 +241,13 @@ const ProfilePage = () => {
                             <div className="card p-5 bg-light">
                                 <h4 className="text-primary">My Pets</h4>
                                 <hr />
-                                <p className="text-muted">You don't have any pets registered yet.</p>
-                                <button className="btn btn-outline-primary btn-sm w-25">
-                                    + Add Pet
-                                </button>
+                                {/*<p className="text-muted">You don't have any pets registered yet.</p>*/}
+                                {/*<button className="btn btn-outline-primary btn-sm w-25">*/}
+                                {/*    + Add Pet*/}
+                                {/*</*/}
+
+                                <PetList pets={pets} onDelete={handleDeletePet} />
+                                <AddPetForm onAdd={handleAddPet} />
                             </div>
                         )}
                     </div>

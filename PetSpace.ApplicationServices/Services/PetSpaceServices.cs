@@ -55,7 +55,6 @@ namespace PetSpace.ApplicationServices.Services
             return result;
         }
 
-
         public async Task<object?> LoginAsync(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -161,7 +160,6 @@ namespace PetSpace.ApplicationServices.Services
             return baseData;
         }
 
-
         public async Task<bool> UpdateUserProfileAsync(Guid userId, UserUpdateDto dto)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -201,6 +199,60 @@ namespace PetSpace.ApplicationServices.Services
                     clinic.UpdatedAt = DateTime.UtcNow;
                 }
             }
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<object>> GetUserPetsAsync(Guid userId)
+        {
+            return await _context.Pets
+                .Where(p => p.OwnerId == userId)
+                .Select(p => new
+                {
+                    petId = p.PetId,
+                    petName = p.PetName,
+                    petSpecies = p.PetSpecies,
+                    petBreed = p.PetBreed,
+                    petGender = p.PetGender,
+                    petBirthDate = p.PetBirthDate,
+                    petMicrochipNr = p.PetMicrochipNr,
+                    petWeight = p.PetWeight
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+        public async Task<bool> AddPetAsync(Guid userId, PetDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return false;
+
+            var pet = new Pet
+            {
+                PetId = Guid.NewGuid(),
+                PetName = dto.PetName,
+                PetSpecies = dto.PetSpecies,
+                PetBreed = dto.PetBreed,
+                PetGender = dto.PetGender,
+                PetBirthDate = dto.PetBirthDate,
+                PetMicrochipNr = dto.PetMicrochipNr,
+                PetWeight = dto.PetWeight,
+                OwnerId = userId
+            };
+
+            _context.Pets.Add(pet);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeletePetAsync(Guid userId, Guid petId)
+        {
+            var pet = await _context.Pets
+                .FirstOrDefaultAsync(p => p.PetId == petId && p.OwnerId == userId);
+
+            if (pet == null) return false;
+
+            _context.Pets.Remove(pet);
             await _context.SaveChangesAsync();
             return true;
         }

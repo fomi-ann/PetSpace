@@ -7,9 +7,13 @@ namespace PetSpace.Core.ServiceInterface
     {
         Task<IdentityResult> RegisterUserAsync(RegisterUserDto dto);
         Task<object?> LoginAsync(LoginDto dto);
-
         Task<object?> GetUserProfileAsync(Guid userId);
         Task<bool> UpdateUserProfileAsync(Guid userId, UserUpdateDto dto);
+
+        Task<List<object>> GetUserPetsAsync(Guid userId);
+        Task<bool> AddPetAsync(Guid userId, PetDto dto);
+        Task<bool> DeletePetAsync(Guid userId, Guid petId);
+
     }
 
 }
