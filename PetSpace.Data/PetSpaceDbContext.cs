@@ -33,20 +33,19 @@ namespace PetSpace.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // Обязательно для Identity!
+            base.OnModelCreating(modelBuilder);
 
-            // User to Pet
             modelBuilder.Entity<PetOwner>()
                 .HasOne(po => po.User)
                 .WithMany(u => u.PetOwners)
                 .HasForeignKey(po => po.UserId);
 
-            modelBuilder.Entity<PetOwner>()
-                .HasOne(po => po.Pet)
-                .WithMany(p => p.PetOwners)
-                .HasForeignKey(po => po.PetId);
+            // Future many-to-many
+            // modelBuilder.Entity<PetOwner>()
+            //     .HasOne(po => po.Pet)
+            //     .WithMany(p => p.PetOwners)
+            //     .HasForeignKey(po => po.PetId);
 
-            // User to Clinic
             modelBuilder.Entity<RegisteredPatient>()
                 .HasOne(rp => rp.User)
                 .WithMany(u => u.RegisteredPatients)
@@ -77,7 +76,6 @@ namespace PetSpace.Data
                 .HasForeignKey(a => a.PetId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // MedicalRecord to Appointment
             modelBuilder.Entity<MedicalRecord>()
                 .HasOne(mr => mr.Appointment)
                 .WithMany()
@@ -99,6 +97,12 @@ namespace PetSpace.Data
                 .WithMany(c => c.Vets)
                 .HasForeignKey(v => v.ClinicId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Pet>()
+                .HasOne(p => p.Owner)
+                .WithMany(u => u.Pets)
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Pet>()
                 .Property(p => p.PetWeight)
