@@ -211,12 +211,12 @@ namespace PetSpace.ApplicationServices.Services
                 {
                     petId = p.PetId,
                     petName = p.PetName,
-                    petSpecies = p.PetSpecies,
-                    petBreed = p.PetBreed,
-                    petGender = p.PetGender,
-                    petBirthDate = p.PetBirthDate,
-                    petMicrochipNr = p.PetMicrochipNr,
-                    petWeight = p.PetWeight
+                    species = p.PetSpecies,
+                    breed = p.PetBreed,
+                    gender = p.PetGender,
+                    birthDate = p.PetBirthDate,
+                    microchipNr = p.PetMicrochipNr,
+                    weight = p.PetWeight
                 })
                 .Cast<object>()
                 .ToListAsync();

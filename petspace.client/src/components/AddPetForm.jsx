@@ -3,9 +3,12 @@ import { useState } from 'react';
 const AddPetForm = ({ onAdd }) => {
     const [formData, setFormData] = useState({
         petName: '',
-        species: '',
-        breed: '',
-        birthDate: ''
+        petSpecies: '',
+        petBreed: '',
+        petGender: '',
+        petBirthDate: '',
+        petMicrochipNr: '',
+        petWeight: ''
     });
 
     const handleChange = (e) => {
@@ -18,72 +21,134 @@ const AddPetForm = ({ onAdd }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onAdd(formData);
+
+        const preparedData = {
+            ...formData,
+            petWeight: formData.petWeight ? parseFloat(formData.petWeight) : null,
+            petBirthDate: formData.petBirthDate || null
+        }
+
+        onAdd(preparedData)
         setFormData({
             petName: '',
-            species: '',
-            breed: '',
-            birthDate: ''
+            petSpecies: '',
+            petBreed: '',
+            petGender: '',
+            petBirthDate: '',
+            petMicrochipNr: '',
+            petWeight: ''
 
         });
     };
 
     return (
         <form onSubmit={handleSubmit} className="mt-4">
-            <div className="mb-3">
-                <label className="form-label">Pet Name</label>
-                <input
-                    type="text"
-                    name="petName"
-                    className="form-control"
-                    value={formData.petName}
-                    onChange={handleChange}
-                    required
-                />
+
+
+            <div className="row">
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Pet Name</label>
+                    <input
+                        type="text"
+                        name="petName"
+                        className="form-control"
+                        value={formData.petName}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Species</label>
+                    <input
+                        type="text"
+                        name="petSpecies"
+                        className="form-control"
+                        value={formData.petSpecies}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Breed</label>
+                    <input
+                        type="text"
+                        name="petBreed"
+                        className="form-control"
+                        value={formData.petBreed}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-md-6 mb-4 d-flex align-items-end ">
+                    <div>
+                        <div className="form-check form-check-inline">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="petGender"
+                                value="Male"
+                                checked={formData.petGender === 'Male'}
+                                onChange={handleChange}
+                            />
+                            <label className="form-check-label">Male</label>
+                        </div>
+
+                        <div className="form-check form-check-inline">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="petGender"
+                                value="Female"
+                                checked={formData.petGender === 'Female'}
+                                onChange={handleChange}
+                            />
+                            <label className="form-check-label">Female</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Birth Date</label>
+                    <input
+                        type="date"
+                        name="petBirthDate"
+                        className="form-control"
+                        value={formData.petBirthDate}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Weight (kg)</label>
+                    <input
+                        type="number"
+                        step="0.1"
+                        name="petWeight"
+                        className="form-control"
+                        value={formData.petWeight}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-12 mb-3">
+                    <label className="form-label">Microchip Number</label>
+                    <input
+                        type="text"
+                        name="petMicrochipNr"
+                        className="form-control"
+                        value={formData.petMicrochipNr}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-12">
+                    <button type="submit" className="btn btn-primary">
+                        Add Pet
+                    </button>
+                </div>
             </div>
-
-            <div className="mb-3">
-                <label className="form-label">Species</label>
-                <input
-                    type="text"
-                    name="species"
-                    className="form-control"
-                    value={formData.species}
-                    onChange={handleChange}
-                    required
-
-                />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Breed</label>
-                <input
-                    type="text"
-                    name="breed"
-                    className="form-control"
-                    value={formData.breed}
-                    onChange={handleChange}
-                />
-            </div>
-
-
-            <div className="mb-3">
-                <label className="form-label">Birth Date</label>
-                <input
-                    type="date"
-                    name="birthDate"
-                    className="form-control"
-                    value={formData.birthDate}
-                    onChange={handleChange}
-                />
-
-            </div>
-
-
-            <button type="submit" className="btn btn-primary">
-                Add Pet
-
-            </button>
 
 
         </form>
