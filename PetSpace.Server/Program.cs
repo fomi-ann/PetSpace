@@ -66,16 +66,22 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
-    {
-        var roleManager = services.GetRequiredService<RoleManager<UserRole>>();
-        await SeedRoles(roleManager);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding roles.");
-    }
+    //try
+    //{
+    //    var roleManager = services.GetRequiredService<RoleManager<UserRole>>();
+    //    await SeedRoles(roleManager);
+    //}
+    //catch (Exception ex)
+    //{
+    //    var logger = services.GetRequiredService<ILogger<Program>>();
+    //    logger.LogError(ex, "An error occurred while seeding roles.");
+    //}
+
+    var roleManager = services.GetRequiredService<RoleManager<UserRole>>();
+    await SeedRoles(roleManager);
+
+    var context = services.GetRequiredService<PetSpaceDbContext>();
+    await SeedAppointmentStatuses(context);
 }
 
 app.UseDefaultFiles();
@@ -106,5 +112,20 @@ static async Task SeedRoles(RoleManager<UserRole> roleManager)
         {
             await roleManager.CreateAsync(new UserRole { Name = roleName });
         }
+    }
+}
+
+static async Task SeedAppointmentStatuses(PetSpaceDbContext context)
+{
+    if (!context.AppointmentStatusCodes.Any())
+    {
+        context.AppointmentStatusCodes.AddRange(
+            new AppointmentStatusCode { AppStatusCodeId = 1, AppStatusCode = "Pending" },
+            new AppointmentStatusCode { AppStatusCodeId = 2, AppStatusCode = "Approved" },
+            new AppointmentStatusCode { AppStatusCodeId = 3, AppStatusCode = "Rejected" },
+            new AppointmentStatusCode { AppStatusCodeId = 4, AppStatusCode = "Completed" }
+        );
+
+        await context.SaveChangesAsync();
     }
 }
