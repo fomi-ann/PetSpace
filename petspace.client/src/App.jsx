@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import ProfilePage from './pages/ProfilePage';
 import AppLayout from './components/layout/AppLayout';
+import CreateAppointmentPage from './pages/CreateAppointmentPage';
 
 function App() {
     return (
@@ -16,6 +17,15 @@ function App() {
                     element={
                         <AppLayout>
                             <ProfilePage />
+                            
+                        </AppLayout>
+                    }
+                />
+                <Route
+                    path="/appointments/create"
+                    element={
+                        <AppLayout>
+                            <CreateAppointmentPage />
                         </AppLayout>
                     }
                 />

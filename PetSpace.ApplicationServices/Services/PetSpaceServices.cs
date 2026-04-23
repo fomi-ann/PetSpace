@@ -352,5 +352,42 @@ namespace PetSpace.ApplicationServices.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task<List<object>> GetAllVetsAsync()
+        {
+            return await _context.Vets
+                .Include(v => v.User)
+                .Include(v => v.Clinic)
+                .Select(v => new
+                {
+                    vetId = v.VetId,
+                    vetName = v.User != null
+
+                        ? v.User.UserFirstName + " " + v.User.UserLastName
+                        : "Unknown vet",
+
+                    clinicId = v.ClinicId,
+                    clinicName = v.Clinic != null ? v.Clinic.ClinicName : "",
+                    specialization = v.VetSpecialization
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+
+
+        public async Task<List<object>> GetAllClinicsAsync()
+        {
+            return await _context.Clinics
+                .Select(c => new
+                {
+                    clinicId = c.ClinicId,
+                    clinicName = c.ClinicName,
+                    clinicAddress = c.ClinicAddress
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
     }
 }

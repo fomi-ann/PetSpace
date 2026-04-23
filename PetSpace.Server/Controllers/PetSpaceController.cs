@@ -190,5 +190,21 @@ namespace PetSpace.Server.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpGet("vets")]
+        public async Task<IActionResult> GetAllVets()
+        {
+            var vets = await _petSpaceService.GetAllVetsAsync();
+            return Ok(vets);
+        }
+
+        [Authorize]
+        [HttpGet("clinics")]
+        public async Task<IActionResult> GetAllClinics()
+        {
+            var clinics = await _petSpaceService.GetAllClinicsAsync();
+            return Ok(clinics);
+        }
     }
 }

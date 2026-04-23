@@ -21,6 +21,10 @@ namespace PetSpace.Core.ServiceInterface
 
         Task<List<object>> GetUserAppointmentsAsync(Guid userId);
         Task<List<object>> GetVetAppointmentsAsync(Guid userId);
+
+
+        Task<List<object>> GetAllVetsAsync();
+        Task<List<object>> GetAllClinicsAsync();
     }
 
 }

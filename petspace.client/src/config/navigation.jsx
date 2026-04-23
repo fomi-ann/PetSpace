@@ -16,5 +16,11 @@ export const navigationLinks = [
         path: '/appointments',
         icon: 'calendar-check',
         roles: ['PetOwner', 'Vet', 'Clinic']
+    },
+    {
+        label: 'Book Appointment',
+        path: '/appointments/create',
+        icon: 'calendar-plus',
+        roles: ['PetOwner']
     }
 ];

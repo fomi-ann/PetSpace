@@ -120,10 +120,10 @@ static async Task SeedAppointmentStatuses(PetSpaceDbContext context)
     if (!context.AppointmentStatusCodes.Any())
     {
         context.AppointmentStatusCodes.AddRange(
-            new AppointmentStatusCode { AppStatusCodeId = 1, AppStatusCode = "Pending" },
-            new AppointmentStatusCode { AppStatusCodeId = 2, AppStatusCode = "Approved" },
-            new AppointmentStatusCode { AppStatusCodeId = 3, AppStatusCode = "Rejected" },
-            new AppointmentStatusCode { AppStatusCodeId = 4, AppStatusCode = "Completed" }
+            new AppointmentStatusCode { AppStatusCode = "Pending" },
+            new AppointmentStatusCode { AppStatusCode = "Approved" },
+            new AppointmentStatusCode { AppStatusCode = "Rejected" },
+            new AppointmentStatusCode { AppStatusCode = "Completed" }
         );
 
         await context.SaveChangesAsync();
