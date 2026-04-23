@@ -122,5 +122,73 @@ namespace PetSpace.Server.Controllers
 
             return Ok();
         }
+
+
+
+        [Authorize]
+        [HttpPost("appointments")]
+        public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+           
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var result = await _petSpaceService.CreateAppointmentAsync(userGuid, dto);
+
+            if (!result)
+                return BadRequest("Failed to create appointment.");
+
+            return Ok();
+        }
+
+
+        [Authorize]
+        [HttpGet("appointments/my")]
+        public async Task<IActionResult> GetMyAppointments()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var appointments = await _petSpaceService.GetUserAppointmentsAsync(userGuid);
+
+            return Ok(appointments);
+
+
+        }
+
+
+        [Authorize]
+        [HttpGet("appointments/vet")]
+        public async Task<IActionResult> GetVetAppointments()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var appointments = await _petSpaceService.GetVetAppointmentsAsync(userGuid);
+
+            return Ok(appointments);
+
+        }
+
+
+        [Authorize]
+        [HttpPut("appointments/{appointmentId}/status")]
+        public async Task<IActionResult> UpdateAppointmentStatus(Guid appointmentId, [FromBody] UpdateAppointmentStatusDto dto)
+        {
+            var result = await _petSpaceService.UpdateAppointmentStatusAsync(appointmentId, dto.AppStatusCodeId);
+
+            if (!result)
+                return BadRequest("Failed to update appointment status.");
+
+            return Ok();
+        }
     }
 }

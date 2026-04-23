@@ -9,6 +9,7 @@ using PetSpace.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using PetSpace.Core.Domain.Enums;
 
 
 namespace PetSpace.ApplicationServices.Services
@@ -253,6 +254,101 @@ namespace PetSpace.ApplicationServices.Services
             if (pet == null) return false;
 
             _context.Pets.Remove(pet);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> CreateAppointmentAsync(Guid userId, CreateAppointmentDto dto)
+        {
+            var pet = await _context.Pets
+                .FirstOrDefaultAsync(p => p.PetId == dto.PetId && p.OwnerId == userId);
+
+            if (pet == null) return false;
+
+            var vet = await _context.Vets.FirstOrDefaultAsync(v => v.VetId == dto.VetId);
+            if (vet == null) return false;
+
+            var clinic = await _context.Clinics.FirstOrDefaultAsync(c => c.ClinicId == dto.ClinicId);
+            if (clinic == null) return false;
+
+            var appointment = new Appointment
+            {
+                AppId = Guid.NewGuid(),
+                AppDateTime = dto.AppDateTime,
+                AppReason = dto.AppReason,
+                AppStatusCodeId = (int)AppointmentStatusEnum.Pending,
+                PetId = dto.PetId,
+                VetId = dto.VetId,
+                ClinicId = dto.ClinicId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Appointments.Add(appointment);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<object>> GetUserAppointmentsAsync(Guid userId)
+        {
+            return await _context.Appointments
+                .Include(a => a.Pet)
+                .Include(a => a.Vet)
+                    .ThenInclude(v => v.User)
+                .Include(a => a.Clinic)
+                .Include(a => a.Status)
+                .Where(a => a.Pet != null && a.Pet.OwnerId == userId)
+                .OrderByDescending(a => a.AppDateTime)
+                .Select(a => new
+                {
+                    appId = a.AppId,
+                    appDateTime = a.AppDateTime,
+                    appReason = a.AppReason,
+                    status = a.Status != null ? a.Status.AppStatusCode : "",
+                    petName = a.Pet != null ? a.Pet.PetName : "",
+                    vetName = a.Vet != null && a.Vet.User != null
+                        ? a.Vet.User.UserFirstName + " " + a.Vet.User.UserLastName
+                        : "",
+                    clinicName = a.Clinic != null ? a.Clinic.ClinicName : ""
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+        public async Task<List<object>> GetVetAppointmentsAsync(Guid userId)
+        {
+            var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == userId);
+            if (vet == null) return new List<object>();
+
+            return await _context.Appointments
+                .Include(a => a.Pet)
+                .Include(a => a.Clinic)
+                .Include(a => a.Status)
+                .Where(a => a.VetId == vet.VetId)
+                .OrderByDescending(a => a.AppDateTime)
+                .Select(a => new
+                {
+                    appId = a.AppId,
+                    appDateTime = a.AppDateTime,
+                    appReason = a.AppReason,
+                    status = a.Status != null ? a.Status.AppStatusCode : "",
+                    petName = a.Pet != null ? a.Pet.PetName : "",
+                    clinicName = a.Clinic != null ? a.Clinic.ClinicName : "",
+                    petId = a.PetId
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, int statusCodeId)
+        {
+            var appointment = await _context.Appointments.FirstOrDefaultAsync(a => a.AppId == appointmentId);
+            if (appointment == null) return false;
+
+            appointment.AppStatusCodeId = statusCodeId;
+            appointment.UpdatedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
             return true;
         }
