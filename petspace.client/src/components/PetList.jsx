@@ -1,4 +1,4 @@
-const PetList = ({ pets, onDelete }) => {
+const PetList = ({ pets, onDelete, onEdit }) => {
 
     const getAgeText = (birthDate) => {
         if (!birthDate) return 'N/A';
@@ -75,6 +75,16 @@ const PetList = ({ pets, onDelete }) => {
                                 <strong>Weight:</strong> {pet.weight ? `${pet.weight} kg` : 'N/A'}
                             </p>
                         </div>
+
+
+                        <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm me-2"
+                            onClick={() => onEdit(pet)}
+                        >
+                            Edit
+                        </button>
+
 
                         <button
                             type="button"

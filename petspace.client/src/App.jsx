@@ -5,6 +5,7 @@ import Register from './components/Register';
 import AppLayout from './components/layout/AppLayout';
 
 import ProfilePage from './pages/ProfilePage';
+import MyPetsPage from './pages/MyPetsPage';
 
 import CreateAppointmentPage from './pages/CreateAppointmentPage';
 import MyAppointmentsPage from './pages/MyAppointmentsPage';
@@ -26,6 +27,15 @@ function App() {
                         <AppLayout>
                             <ProfilePage />
                             
+                        </AppLayout>
+                    }
+                />
+
+                <Route
+                    path="/pets"
+                    element={
+                        <AppLayout>
+                            <MyPetsPage />
                         </AppLayout>
                     }
                 />

@@ -246,6 +246,27 @@ namespace PetSpace.ApplicationServices.Services
             return true;
         }
 
+        public async Task<bool> UpdatePetAsync(Guid userId, Guid petId, PetDto dto)
+        {
+            var pet = await _context.Pets
+                .FirstOrDefaultAsync(p => p.PetId == petId && p.OwnerId == userId);
+
+            if (pet == null) return false;
+
+            pet.PetName = dto.PetName;
+            pet.PetSpecies = dto.PetSpecies;
+            pet.PetBreed = dto.PetBreed;
+            pet.PetGender = dto.PetGender;
+            pet.PetBirthDate = dto.PetBirthDate;
+            pet.PetMicrochipNr = dto.PetMicrochipNr;
+            pet.PetWeight = dto.PetWeight;
+
+            pet.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> DeletePetAsync(Guid userId, Guid petId)
         {
             var pet = await _context.Pets

@@ -107,6 +107,24 @@ namespace PetSpace.Server.Controllers
         }
 
         [Authorize]
+        [HttpPut("pets/{petId}")]
+        public async Task<IActionResult> UpdatePet(Guid petId, [FromBody] PetDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var result = await _petSpaceService.UpdatePetAsync(userGuid, petId, dto);
+
+            if (!result)
+                return BadRequest("Failed to update pet.");
+
+            return Ok();
+        }
+
+        [Authorize]
         [HttpDelete("pets/{petId}")]
         public async Task<IActionResult> DeletePet(Guid petId)
         {
@@ -124,7 +142,7 @@ namespace PetSpace.Server.Controllers
         }
 
 
-
+        
         [Authorize]
         [HttpPost("appointments")]
         public async Task<IActionResult> CreateAppointment([FromBody] CreateAppointmentDto dto)

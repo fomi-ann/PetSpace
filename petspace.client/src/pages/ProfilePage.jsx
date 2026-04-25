@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import UserIdentityCard from '../components/UserIdentityCard';
 import UpdateProfileForm from '../components/UpdateProfileForm';
 
-import AddPetForm from '../components/AddPetForm';
-import PetList from '../components/PetList';
+
 
 const ProfilePage = () => {
 
@@ -163,45 +162,9 @@ const ProfilePage = () => {
     const fieldsConfig = getFieldsConfig(role);
 
 
-    const handleAddPet = async (petData) => {
-        try {
-            const response = await fetch('/api/pets', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(petData)
-            });
 
-            if (response.ok) {
-                await fetchPets();
-            } else {
-                alert('Failed to add pet.');
-            }
-        } catch (err) {
-            console.error('Add pet error:', err);
-        }
-    };
 
-    const handleDeletePet = async (petId) => {
-        try {
-            const response = await fetch(`/api/pets/${petId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                setPets(prev => prev.filter(pet => pet.petId !== petId));
-            } else {
-                alert('Failed to delete pet.');
-            }
-        } catch (err) {
-            console.error('Delete pet error:', err);
-        }
-    };
+    
 
     return (
         <div className="container mt-5" style={{ maxWidth: '800px' }}>
@@ -239,15 +202,42 @@ const ProfilePage = () => {
 
                         {role === 'PetOwner' && (
                             <div className="card p-5 bg-light">
-                                <h4 className="text-primary">My Pets</h4>
-                                <hr />
-                                {/*<p className="text-muted">You don't have any pets registered yet.</p>*/}
-                                {/*<button className="btn btn-outline-primary btn-sm w-25">*/}
-                                {/*    + Add Pet*/}
-                                {/*</*/}
 
-                                <PetList pets={pets} onDelete={handleDeletePet} />
-                                <AddPetForm onAdd={handleAddPet} />
+
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 className="text-primary">My Pets</h4>
+                                    <a href="/pets" className="btn btn-outline-primary btn-sm">
+                                        Manage pets
+                                    </a>
+                                </div>
+
+
+                                <hr />
+
+                                {!pets.length && (
+                                    <p className="text-muted">You don't have any pets registered yet.</p>
+                                )}
+
+
+                                {pets.slice(0, 3).map(pet => (
+
+                                    <div key={pet.petId} className="border rounded p-3 mb-2 bg-white text-start">
+
+                                        <h5 className="mb-1">{pet.petName}</h5>
+
+                                        <p className="mb-1">
+                                            <strong>Species:</strong> {pet.species || 'N/A'}
+                                        </p>
+
+                                        <p className="mb-0">
+                                            <strong>Weight:</strong> {pet.weight ? `${pet.weight} kg` : 'N/A'}
+                                        </p>
+
+
+                                    </div>
+                                ))}
+
+
                             </div>
                         )}
                     </div>

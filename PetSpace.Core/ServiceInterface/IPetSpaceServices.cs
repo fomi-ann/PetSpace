@@ -14,6 +14,7 @@ namespace PetSpace.Core.ServiceInterface
 
         Task<List<object>> GetUserPetsAsync(Guid userId);
         Task<bool> AddPetAsync(Guid userId, PetDto dto);
+        Task<bool> UpdatePetAsync(Guid userId, Guid petId, PetDto dto);
         Task<bool> DeletePetAsync(Guid userId, Guid petId);
 
         Task<bool> CreateAppointmentAsync(Guid userId, CreateAppointmentDto dto);

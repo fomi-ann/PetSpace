@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const AddPetForm = ({ onAdd }) => {
+const PetForm = ({ onSubmit, initialData = null, buttonText = 'Add Pet' }) => {
+
+
     const [formData, setFormData] = useState({
         petName: '',
         petSpecies: '',
@@ -10,6 +12,37 @@ const AddPetForm = ({ onAdd }) => {
         petMicrochipNr: '',
         petWeight: ''
     });
+
+
+    useEffect(() => {
+        if (!initialData) {
+            // ? problem
+            setFormData({
+                petName: '',
+                petSpecies: '',
+                petBreed: '',
+                petGender: '',
+                petBirthDate: '',
+                petMicrochipNr: '',
+                petWeight: ''
+            });
+            return;
+        }
+
+
+       
+        setFormData({
+            petName: initialData.petName || '',
+            petSpecies: initialData.species || '',
+            petBreed: initialData.breed || '',
+            petGender: initialData.gender || '',
+            petBirthDate: initialData.birthDate
+                ? initialData.birthDate.slice(0, 10)
+                : '',
+            petMicrochipNr: initialData.microchipNr || '',
+            petWeight: initialData.weight || ''
+        });
+    }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,17 +61,8 @@ const AddPetForm = ({ onAdd }) => {
             petBirthDate: formData.petBirthDate || null
         }
 
-        onAdd(preparedData)
-        setFormData({
-            petName: '',
-            petSpecies: '',
-            petBreed: '',
-            petGender: '',
-            petBirthDate: '',
-            petMicrochipNr: '',
-            petWeight: ''
+        onSubmit(preparedData);
 
-        });
     };
 
     return (
@@ -145,9 +169,10 @@ const AddPetForm = ({ onAdd }) => {
 
                 <div className="col-12">
                     <button type="submit" className="btn btn-primary">
-                        Add Pet
+                        { buttonText }
                     </button>
                 </div>
+
             </div>
 
 
@@ -155,4 +180,4 @@ const AddPetForm = ({ onAdd }) => {
     );
 };
 
-export default AddPetForm;
+export default PetForm;
