@@ -5,13 +5,17 @@ import Register from './components/Register';
 import ProfilePage from './pages/ProfilePage';
 import AppLayout from './components/layout/AppLayout';
 import CreateAppointmentPage from './pages/CreateAppointmentPage';
+import VetAppointmentsPage from './pages/VetAppointmentsPage';
 
 function App() {
     return (
         <Router>
             <Routes>
+
                 <Route path="/" element={<Login />} />
+
                 <Route path="/register" element={<Register />} />
+
                 <Route
                     path="/profile"
                     element={
@@ -21,6 +25,7 @@ function App() {
                         </AppLayout>
                     }
                 />
+
                 <Route
                     path="/appointments/create"
                     element={
@@ -29,7 +34,22 @@ function App() {
                         </AppLayout>
                     }
                 />
+
+                <Route
+                    path="/appointments/vet"
+                    element={
+                        <AppLayout>
+                            <VetAppointmentsPage />
+                        </AppLayout>
+                    }
+                />
+
+
+
             </Routes>
+
+            
+
         </Router>
     );
 }
