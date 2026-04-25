@@ -2,9 +2,13 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Register';
-import ProfilePage from './pages/ProfilePage';
 import AppLayout from './components/layout/AppLayout';
+
+import ProfilePage from './pages/ProfilePage';
+
 import CreateAppointmentPage from './pages/CreateAppointmentPage';
+import MyAppointmentsPage from './pages/MyAppointmentsPage';
+
 import VetAppointmentsPage from './pages/VetAppointmentsPage';
 
 function App() {
@@ -31,6 +35,15 @@ function App() {
                     element={
                         <AppLayout>
                             <CreateAppointmentPage />
+                        </AppLayout>
+                    }
+                />
+
+                <Route
+                    path="/appointments/my"
+                    element={
+                        <AppLayout>
+                            <MyAppointmentsPage />
                         </AppLayout>
                     }
                 />
