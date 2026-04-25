@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const PetForm = ({ onSubmit, initialData = null, buttonText = 'Add Pet' }) => {
+const PetForm = ({ onSubmit, initialData = null, buttonText, onCancel }) => {
 
 
     const [formData, setFormData] = useState({
@@ -167,10 +167,20 @@ const PetForm = ({ onSubmit, initialData = null, buttonText = 'Add Pet' }) => {
                     />
                 </div>
 
-                <div className="col-12">
+                <div className="d-flex gap-2">
                     <button type="submit" className="btn btn-primary">
-                        { buttonText }
+                        {buttonText}
                     </button>
+
+                    {onCancel && (
+                        <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={onCancel}
+                        >
+                            Cancel
+                        </button>
+                    )}
                 </div>
 
             </div>

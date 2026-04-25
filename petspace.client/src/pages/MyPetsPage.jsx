@@ -101,44 +101,38 @@ const MyPetsPage = () => {
     };
 
     return (
-        <div className="container mt-5" style={{ maxWidth: '900px' }}>
-            <div className="card p-5">
-                <h3 className="text-primary mb-4">My Pets</h3>
+        <div className="container mt-5" style={{ maxWidth: '1100px' }}>
+            <div className="row">
+                <div className="col-md-7">
+                    <div className="card p-4">
+                        <h3 className="text-primary mb-4">My Pets</h3>
 
-                {error && <div className="alert alert-danger">{error}</div>}
+                        {error && <div className="alert alert-danger">{error}</div>}
 
-                <PetList pets={pets} onDelete={handleDeletePet} onEdit={setEditingPet} />
+                        <PetList
+                            pets={pets}
+                            onDelete={handleDeletePet}
+                            onEdit={setEditingPet}
+                        />
+                    </div>
+                </div>
 
-                <hr className="my-4" />
+                <div className="col-md-5">
+                    <div className="card p-4">
+                        <h4 className="text-secondary mb-3">
+                            {editingPet ? 'Edit Pet' : 'Add New Pet'}
+                        </h4>
 
-                {/*<h4 className="text-secondary mb-3">Add New Pet</h4>*/}
-                {/*<AddPetForm onAdd={handleAddPet} />*/}
-
-                {editingPet ? (
-                    <>
-                        <h4>Edit Pet</h4>
                         <PetForm
                             initialData={editingPet}
-                            onSubmit={handleUpdatePet}
-                            buttonText="Save Changes"
+                            onSubmit={editingPet ? handleUpdatePet : handleAddPet}
+                            buttonText={editingPet ? 'Save Changes' : 'Add Pet'}
+                            onCancel={editingPet ? () => setEditingPet(null) : null}
                         />
 
-                        <div className="mt-3">
-                            <button
-                                className="btn btn-outline-secondary"
-                                onClick={() => setEditingPet(null)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <h4>Add New Pet</h4>
-                        <PetForm onSubmit={handleAddPet} />
-                    </>
-                )}
-
+                        
+                    </div>
+                </div>
             </div>
         </div>
     );
