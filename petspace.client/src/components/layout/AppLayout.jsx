@@ -1,15 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
 import { navigationLinks } from '../../config/navigation';
 
-const AppLayout = ({ children }) => {
+const AppLayout = ({ children, showMenu = true, showGreeting = true }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
 
     const userRole = localStorage.getItem('userRole');
-    const userName = localStorage.getItem('userFirstName') || '';
+    const [userName, setUserName] = useState(localStorage.getItem('userFirstName') || '');
+
+
 
     const filteredLinks = useMemo(() => {
         return navigationLinks.filter(link => link.roles.includes(userRole));
@@ -25,12 +27,26 @@ const AppLayout = ({ children }) => {
     const openSidebar = () => setIsSidebarOpen(true);
     const closeSidebar = () => setIsSidebarOpen(false);
 
+    useEffect(() => {
+        const handleUserNameUpdated = () => {
+            setUserName(localStorage.getItem('userFirstName') || '');
+        };
+
+        window.addEventListener('userNameUpdated', handleUserNameUpdated);
+
+        return () => {
+            window.removeEventListener('userNameUpdated', handleUserNameUpdated);
+        };
+    }, []);
+
     return (
         <div className="min-vh-100 bg-light">
             <AppHeader
                 onMenuClick={openSidebar}
                 userName={userName}
                 onLogout={handleLogout}
+                showMenu={showMenu}
+                showGreeting={showGreeting}
             />
 
             <AppSidebar

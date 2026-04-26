@@ -23,6 +23,10 @@ body,
   padding: 0;
 }
 
+html {
+    scrollbar-gutter: stable;
+}
+
 body {
   min-width: 320px;
   background-color: #f8f9fa;

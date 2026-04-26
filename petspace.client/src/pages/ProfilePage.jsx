@@ -42,6 +42,7 @@ const ProfilePage = () => {
                     console.log('PROFILE DATA:', data);
                     setProfile(data);
                     localStorage.setItem('userFirstName', data.userFirstName || '');
+                    window.dispatchEvent(new Event('userNameUpdated'));
                 } else {
                     setError('Profile not found.');
                 
@@ -95,6 +96,10 @@ const ProfilePage = () => {
                     address: updatedData.address,
                     phone: updatedData.phone
                 }));
+
+                localStorage.setItem('userFirstName', updatedData.firstName || '');
+                window.dispatchEvent(new Event('userNameUpdated'));
+
             } else {
                 alert('Failed to update profile.');
             }

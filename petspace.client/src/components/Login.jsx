@@ -23,6 +23,8 @@ const Login = () => {
 
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('userRole', data.role);
+                localStorage.setItem('userFirstName', data.userFirstName);
+                localStorage.removeItem('userFirstName');
                 // console.log("TOKEEEEEN", data.token);
                 navigate('/profile');
             } else {
