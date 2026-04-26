@@ -23,7 +23,10 @@ const AppSidebar = ({ isOpen, onClose, links }) => {
                     transition: 'transform 0.3s ease-in-out'
                 }}
             >
-                <div className="d-flex align-items-center justify-content-between p-3 border-bottom">
+                <div
+                    className="d-flex align-items-center justify-content-between px-3 border-bottom"
+                    style={{ height: '56px' }}
+                >
                     <div className="d-flex align-items-center">
                         <i className="bi bi-stars me-2 text-primary"></i>
                         <span className="fw-bold fs-5">PetSpace</span>
@@ -31,11 +34,11 @@ const AppSidebar = ({ isOpen, onClose, links }) => {
 
                     <button
                         type="button"
-                        className="btn btn-sm btn-danger"
+                        className="btn btn-sm btn-outline-danger"
                         onClick={onClose}
                         aria-label="Close navigation"
                     >
-                        <i className="bi bi-x-lg"></i>
+                        <i className="bi bi-x"></i>
                     </button>
                 </div>
 
