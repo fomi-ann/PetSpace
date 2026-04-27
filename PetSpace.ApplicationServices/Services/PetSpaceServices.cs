@@ -396,8 +396,6 @@ namespace PetSpace.ApplicationServices.Services
                 .ToListAsync();
         }
 
-
-
         public async Task<List<object>> GetAllClinicsAsync()
         {
             return await _context.Clinics
@@ -406,6 +404,84 @@ namespace PetSpace.ApplicationServices.Services
                     clinicId = c.ClinicId,
                     clinicName = c.ClinicName,
                     clinicAddress = c.ClinicAddress
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+
+        public async Task<bool> CreateMedicalRecordAsync(Guid vetUserId, CreateMedicalRecordDto dto)
+        {
+            var vet = await _context.Vets
+                .FirstOrDefaultAsync(v => v.UserId == vetUserId);
+
+            if (vet == null) return false;
+
+            var appointment = await _context.Appointments
+                .FirstOrDefaultAsync(a => a.AppId == dto.AppId);
+
+            if (appointment == null) return false;
+
+            if (appointment.VetId != vet.VetId) return false;
+
+
+            var record = new MedicalRecord
+            {
+                MedicalRecordId = Guid.NewGuid(),
+                Diagnosis = dto.Diagnosis,
+                TreatmentPlan = dto.TreatmentPlan,
+                PetWeight = dto.PetWeight,
+                Comment = dto.Comment,
+
+                AppId = appointment.AppId,
+                PetId = appointment.PetId,
+                VetId = vet.VetId,
+
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.MedicalRecords.Add(record);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<object>> GetPetMedicalRecordsAsync(Guid userId, Guid petId)
+        {
+            var pet = await _context.Pets
+                .FirstOrDefaultAsync(p => p.PetId == petId && p.OwnerId == userId);
+
+            if (pet == null)
+                return new List<object>();
+
+            return await _context.MedicalRecords
+                .Include(mr => mr.Appointment)
+                    .ThenInclude(a => a.Clinic)
+                .Include(mr => mr.Vet)
+                    .ThenInclude(v => v.User)
+                .Where(mr => mr.PetId == petId)
+                .OrderByDescending(mr => mr.CreatedAt)
+                .Select(mr => new
+                {
+                    medicalRecordId = mr.MedicalRecordId,
+                    diagnosis = mr.Diagnosis,
+                    treatmentPlan = mr.TreatmentPlan,
+                    petWeight = mr.PetWeight,
+                    comment = mr.Comment,
+                    createdAt = mr.CreatedAt,
+
+                    appointmentDate = mr.Appointment != null
+                        ? mr.Appointment.AppDateTime
+                        : (DateTime?)null,
+
+                    clinicName = mr.Appointment != null && mr.Appointment.Clinic != null
+                        ? mr.Appointment.Clinic.ClinicName
+                        : "",
+
+                    vetName = mr.Vet != null && mr.Vet.User != null
+                        ? mr.Vet.User.UserFirstName + " " + mr.Vet.User.UserLastName
+                        : ""
                 })
                 .Cast<object>()
                 .ToListAsync();

@@ -8,11 +8,14 @@ import AppLayout from './components/layout/AppLayout';
 
 import ProfilePage from './pages/ProfilePage';
 import MyPetsPage from './pages/MyPetsPage';
+import HealthHistoryPage from './pages/HealthHistoryPage';
 
 import CreateAppointmentPage from './pages/CreateAppointmentPage';
 import MyAppointmentsPage from './pages/MyAppointmentsPage';
 
 import VetAppointmentsPage from './pages/VetAppointmentsPage';
+
+
 
 function App() {
     return (
@@ -82,7 +85,14 @@ function App() {
                     }
                 />
 
-
+                <Route
+                    path="/health-history"
+                    element={
+                        <AppLayout>
+                            <HealthHistoryPage />
+                        </AppLayout>
+                    }
+                />
 
             </Routes>
 

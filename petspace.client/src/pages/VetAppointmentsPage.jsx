@@ -6,6 +6,13 @@ const VetAppointmentsPage = () => {
     const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState('');
 
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+    const [diagnosis, setDiagnosis] = useState('');
+    const [treatmentPlan, setTreatmentPlan] = useState('');
+    const [petWeight, setPetWeight] = useState('');
+    const [comment, setComment] = useState('');
+
     const fetchAppointments = async () => {
         try {
             const response = await fetch('/api/appointments/vet', {
@@ -53,6 +60,45 @@ const VetAppointmentsPage = () => {
 
         } catch (err) {
             console.error('Status update error:', err);
+        }
+    };
+
+    const handleCreateMedicalRecord = async (e) => {
+        e.preventDefault();
+
+        if (!selectedAppointment) return;
+
+        const dto = {
+            appId: selectedAppointment.appId,
+            diagnosis,
+            treatmentPlan,
+            petWeight: petWeight ? parseFloat(petWeight) : 0,
+            comment
+        };
+
+        try {
+            const response = await fetch('/api/medical-records', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dto)
+            });
+
+            if (response.ok) {
+                alert('Medical record created successfully.');
+
+                setSelectedAppointment(null);
+                setDiagnosis('');
+                setTreatmentPlan('');
+                setPetWeight('');
+                setComment('');
+            } else {
+                alert('Failed to create medical record.');
+            }
+        } catch (err) {
+            console.error('Medical record create error:', err);
         }
     };
 
@@ -119,11 +165,93 @@ const VetAppointmentsPage = () => {
                                 Complete
                             </button>
 
+                            {app.status === 'Completed' && (
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() => setSelectedAppointment(app)}
+                                >
+                                    Add Medical Record
+                                </button>
+                            )}
+
+
                         </div>
 
                     </div>
 
                 ))}
+
+
+                {selectedAppointment && (
+                    <div className="card p-4 mt-4 bg-light text-start">
+                        <h4 className="mb-3">Add Medical Record</h4>
+
+                        <p className="text-muted small">
+                            Pet: <strong>{selectedAppointment.petName}</strong>
+                        </p>
+
+                        <form onSubmit={handleCreateMedicalRecord}>
+                            <div className="mb-3">
+                                <label className="form-label">Diagnosis</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={diagnosis}
+                                    onChange={(e) => setDiagnosis(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Treatment Plan</label>
+                                <textarea
+                                    className="form-control"
+                                    rows="3"
+                                    value={treatmentPlan}
+                                    onChange={(e) => setTreatmentPlan(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Pet Weight (kg)</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    className="form-control"
+                                    value={petWeight}
+                                    onChange={(e) => setPetWeight(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Comment</label>
+                                <textarea
+                                    className="form-control"
+                                    rows="3"
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="d-flex gap-2">
+                                <button type="submit" className="btn btn-primary">
+                                    Save Record
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => setSelectedAppointment(null)}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                )}
+
             </div>
 
 

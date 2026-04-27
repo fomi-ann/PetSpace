@@ -26,6 +26,9 @@ namespace PetSpace.Core.ServiceInterface
 
         Task<List<object>> GetAllVetsAsync();
         Task<List<object>> GetAllClinicsAsync();
+
+        Task<bool> CreateMedicalRecordAsync(Guid vetUserId, CreateMedicalRecordDto dto);
+        Task<List<object>> GetPetMedicalRecordsAsync(Guid userId, Guid petId);
     }
 
 }

@@ -224,5 +224,39 @@ namespace PetSpace.Server.Controllers
             var clinics = await _petSpaceService.GetAllClinicsAsync();
             return Ok(clinics);
         }
+
+
+        [Authorize(Roles = "Vet")]
+        [HttpPost("medical-records")]
+        public async Task<IActionResult> CreateMedicalRecord([FromBody] CreateMedicalRecordDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var result = await _petSpaceService.CreateMedicalRecordAsync(userGuid, dto);
+
+            if (!result)
+                return BadRequest("Failed to create medical record.");
+
+            return Ok();
+        }
+
+        [Authorize(Roles = "PetOwner")]
+        [HttpGet("pets/{petId}/medical-records")]
+        public async Task<IActionResult> GetPetMedicalRecords(Guid petId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var records = await _petSpaceService.GetPetMedicalRecordsAsync(userGuid, petId);
+
+            return Ok(records);
+        }
     }
 }

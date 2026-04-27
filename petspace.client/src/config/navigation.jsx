@@ -11,12 +11,12 @@ export const navigationLinks = [
         icon: 'heart',
         roles: ['PetOwner']
     },
-    //{
-    //    label: 'Appointments',
-    //    path: '/appointments',
-    //    icon: 'calendar-check',
-    //    roles: ['PetOwner', 'Vet', 'Clinic']
-    //},
+    {
+        label: 'Health History',
+        path: '/health-history',
+        icon: 'clipboard2-pulse',
+        roles: ['PetOwner']
+    },
 
     //PetOwner App
     {
