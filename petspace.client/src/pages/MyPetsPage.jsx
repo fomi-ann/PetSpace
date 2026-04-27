@@ -124,6 +124,7 @@ const MyPetsPage = () => {
                         </h4>
 
                         <PetForm
+                            key={editingPet ? editingPet.petId : 'add-pet'}
                             initialData={editingPet}
                             onSubmit={editingPet ? handleUpdatePet : handleAddPet}
                             buttonText={editingPet ? 'Save Changes' : 'Add Pet'}

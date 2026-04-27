@@ -1,16 +1,30 @@
 ﻿import { useState } from 'react';
 
-const UpdateProfileForm = ({ fields, profile, onSave }) => {
+const emptyForm = {
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    clinicName: '',
+    address: '',
+    phone: '',
+    specialization: '',
+    licence: ''
+};
+
+const UpdateProfileForm = ({ fields, initialData = null, onSave, onCancel }) => {
     const [formData, setFormData] = useState(() => ({
-        firstName: profile?.userFirstName || '',
-        lastName: profile?.userLastName || '',
-        phoneNumber: profile?.phoneNumber || '',
-        clinicName: profile?.clinicName || '',
-        clinicAddress: profile?.address || '',
-        clinicPhone: profile?.phone || '',
-        vetSpecialization: profile?.specialization || '',
-        vetLicence: profile?.licence || ''
+        ...emptyForm,
+        firstName: initialData?.userFirstName || initialData?.firstName || '',
+        lastName: initialData?.userLastName || initialData?.lastName || '',
+        phoneNumber: initialData?.phoneNumber || '',
+        clinicName: initialData?.clinicName || '',
+        address: initialData?.address || '',
+        phone: initialData?.phone || '',
+        specialization: initialData?.specialization || '',
+        licence: initialData?.licence || ''
     }));
+
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,7 +37,11 @@ const UpdateProfileForm = ({ fields, profile, onSave }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSave(formData);
-    };
+        setFormData(emptyForm);
+    };       
+
+
+
 
     return (
         <form onSubmit={handleSubmit}>
@@ -41,9 +59,33 @@ const UpdateProfileForm = ({ fields, profile, onSave }) => {
                 </div>
             ))}
 
-            <button type="submit" className="btn btn-primary w-100">
-                Save Changes
-            </button>
+            <div className="d-flex gap-2">
+                <button type="submit" className="btn btn-primary">
+                    Save Changes
+                </button>
+
+                {onCancel && (
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => {
+                            setFormData({
+                                firstName: '',
+                                lastName: '',
+                                phoneNumber: '',
+                                clinicName: '',
+                                address: '',
+                                phone: '',
+                                specialization: '',
+                                licence: ''
+                            });
+                            onCancel();
+                        }}
+                    >
+                        Cancel
+                    </button>
+                )}
+            </div>
         </form>
     );
 };
