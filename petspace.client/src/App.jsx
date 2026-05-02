@@ -14,6 +14,7 @@ import CreateAppointmentPage from './pages/CreateAppointmentPage';
 import MyAppointmentsPage from './pages/MyAppointmentsPage';
 
 import VetAppointmentsPage from './pages/VetAppointmentsPage';
+import ClinicVetRequestsPage from './pages/ClinicVetRequestsPage';
 
 
 
@@ -90,6 +91,15 @@ function App() {
                     element={
                         <AppLayout>
                             <HealthHistoryPage />
+                        </AppLayout>
+                    }
+                />
+
+                <Route
+                    path="/clinic/vet-requests"
+                    element={
+                        <AppLayout>
+                            <ClinicVetRequestsPage />
                         </AppLayout>
                     }
                 />

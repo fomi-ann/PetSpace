@@ -39,7 +39,13 @@ export const navigationLinks = [
         path: '/appointments/vet',
         icon: 'calendar-week',
         roles: ['Vet']
-    }
+    },
     //
 
+    {
+        label: 'Vet Requests',
+        path: '/clinic/vet-requests',
+        icon: 'person-check',
+        roles: ['Clinic']
+    }
 ];
