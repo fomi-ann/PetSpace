@@ -35,6 +35,8 @@ namespace PetSpace.Core.ServiceInterface
         Task<bool> RequestClinicVerificationAsync(Guid vetUserId, Guid clinicId);
         Task<List<object>> GetClinicVetRequestsAsync(Guid clinicUserId);
         Task<bool> UpdateVetVerificationAsync(Guid clinicUserId, Guid vetId, bool approve);
+
+        Task<List<object>> GetClinicVerifiedVetsAsync(Guid clinicUserId);
     }
 
 }

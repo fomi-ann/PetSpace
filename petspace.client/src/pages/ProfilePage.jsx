@@ -15,6 +15,7 @@ const ProfilePage = () => {
     const [clinics, setClinics] = useState([]);
     const [selectedClinicId, setSelectedClinicId] = useState('');
 
+    const [verifiedVets, setVerifiedVets] = useState([]);
 
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
@@ -33,6 +34,21 @@ const ProfilePage = () => {
             }
         } catch (err) {
             console.error('Pets fetch error:', err);
+        }
+    };
+
+    const fetchVerifiedVets = async () => {
+        try {
+            const response = await fetch('/api/clinic/verified-vets', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setVerifiedVets(data);
+            }
+        } catch (err) {
+            console.error('Verified vets fetch error:', err);
         }
     };
 
@@ -85,6 +101,9 @@ const ProfilePage = () => {
 
         const loadData = async () => {
             await fetchProfile();
+            if (role === 'Clinic') {
+                await fetchVerifiedVets();
+            }
             await fetchPets();
             await fetchClinics();
         };
@@ -162,7 +181,8 @@ const ProfilePage = () => {
                 return [
                     ...common,
                     { name: 'specialization', label: 'Specialization', icon: 'patch-check' },
-                    { name: 'licence', label: 'Licence', icon: 'card-text' }
+                    { name: 'licence', label: 'Licence', icon: 'card-text' },
+                    { name: 'clinicName', label: 'Clinic', icon: 'hospital' },
                 ];
 
             case 'Clinic':
@@ -228,6 +248,7 @@ const ProfilePage = () => {
                             profile={profile}
                             config={displayConfig}
                             title={`${role} Profile`}
+                            role={role}
                             onEdit={setEditingProfile}
                         />
 
@@ -273,7 +294,43 @@ const ProfilePage = () => {
                             </div>
                         )}
 
-                        
+                        {role === 'Clinic' && (
+                            <div className="card p-4 bg-light">
+                                <h4 className="text-primary mb-3">Verified Veterinarians</h4>
+
+                                {!verifiedVets.length && (
+                                    <p className="text-muted mb-0">
+                                        No verified veterinarians yet.
+                                    </p>
+                                )}
+
+                                {!!verifiedVets.length && (
+                                    <div className="table-responsive">
+                                        <table className="table table-hover align-middle mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Specialization</th>
+                                                    <th>Licence</th>
+                                                    <th>Email</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {verifiedVets.map(vet => (
+                                                    <tr key={vet.vetId}>
+                                                        <td>{vet.vetName} {vet.vetLastName}</td>
+                                                        <td>{vet.specialization || 'N/A'}</td>
+                                                        <td>{vet.licence || 'N/A'}</td>
+                                                        <td>{vet.email || 'N/A'}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div className="col-md-5 d-grid gap-4">
@@ -302,15 +359,10 @@ const ProfilePage = () => {
                                     Send Request
                                 </button>
 
-                                <div className="mt-2">
-                                    {profile.isVerified ? (
-                                        <span className="badge bg-success">Verified</span>
-                                    ) : profile.clinicId ? (
-                                        <span className="badge bg-warning text-dark">Pending</span>
-                                    ) : null}
+                            
                                     </div>
                                 </div>
-                            </div>
+
                         )}
 
                         <div className="card p-4">

@@ -119,6 +119,7 @@ namespace PetSpace.ApplicationServices.Services
             {
                 var vet = await _context.Vets
                     .Include(v => v.User)
+                    .Include(v => v.Clinic)
                     .FirstOrDefaultAsync(v => v.UserId == userId);
 
                 if (vet == null) return baseData;
@@ -132,7 +133,12 @@ namespace PetSpace.ApplicationServices.Services
                     baseData.role,
                     specialization = vet.VetSpecialization,
                     licence = vet.VetLicence,
-                    isVerified = vet.IsVerified
+                    
+                    isVerified = vet.IsVerified,
+                    verifiedAt = vet.VerifiedAt,
+
+                    clinicId = vet.ClinicId,
+                    clinicName = vet.Clinic != null ? vet.Clinic.ClinicName : ""
                 };
             }
 
@@ -650,6 +656,30 @@ namespace PetSpace.ApplicationServices.Services
             return true;
         }
 
+        public async Task<List<object>> GetClinicVerifiedVetsAsync(Guid clinicUserId)
+        {
+            var clinic = await _context.Clinics
+                .FirstOrDefaultAsync(c => c.UserId == clinicUserId);
+
+            if (clinic == null) return new List<object>();
+
+            return await _context.Vets
+                .Include(v => v.User)
+                .Where(v => v.ClinicId == clinic.ClinicId && v.IsVerified)
+                .Select(v => new
+                {
+                    vetId = v.VetId,
+                    vetName = v.User != null
+                        ? v.User.UserFirstName + " " + v.User.UserLastName
+                        : "Unknown vet",
+                    email = v.User != null ? v.User.Email : "",
+                    specialization = v.VetSpecialization,
+                    licence = v.VetLicence,
+                    verifiedAt = v.VerifiedAt
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
 
     }
 }

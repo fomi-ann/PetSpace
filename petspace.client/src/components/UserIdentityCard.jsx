@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UserIdentityCard = ({ profile, config, title, onEdit }) => {
+const UserIdentityCard = ({ profile, config, title, onEdit, role }) => {
 
     if (!profile) return null;
     const displayFields = config || [];
@@ -30,9 +30,23 @@ const UserIdentityCard = ({ profile, config, title, onEdit }) => {
                     </div>
 
                     <div className="col text-start">
-                        <h2 className="mb-2 fw-bold text-dark">
-                            {profile.userFirstName} {profile.userLastName}
-                        </h2>
+                        <div className="d-flex align-items-center gap-2 mb-2">
+                            <h2 className="mb-0 fw-bold text-dark">
+                                {profile.userFirstName} {profile.userLastName}
+                            </h2>
+
+                            {role === 'Vet' && profile.isVerified && (
+                                <span className="badge bg-success fw-normal" style={{ fontSize: '0.75rem' }}>
+                                    Verified
+                                </span>
+                            )}
+
+                            {role === 'Vet' && !profile.isVerified && profile.clinicName && (
+                                <span className="badge bg-warning text-dark fw-normal" style={{ fontSize: '0.75rem' }}>
+                                    Pending
+                                </span>
+                            )}
+                        </div>
 
                         <div className="text-muted mb-2 d-flex align-items-center">
                             <i className="bi bi-envelope me-2 text-primary"></i>

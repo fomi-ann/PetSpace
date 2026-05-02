@@ -331,5 +331,20 @@ namespace PetSpace.Server.Controllers
 
             return Ok();
         }
+
+        [Authorize(Roles = "Clinic")]
+        [HttpGet("clinic/verified-vets")]
+        public async Task<IActionResult> GetClinicVerifiedVets()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var vets = await _petSpaceService.GetClinicVerifiedVetsAsync(userGuid);
+
+            return Ok(vets);
+        }
     }
 }
