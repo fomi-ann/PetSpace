@@ -1,69 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+
+
+const emptyForm = {
+    petName: '',
+    petSpecies: '',
+    petBreed: '',
+    petGender: '',
+    petBirthDate: '',
+    petMicrochipNr: '',
+    petWeight: ''
+};
 
 const PetForm = ({ onSubmit, initialData = null, buttonText, onCancel }) => {
-
-
-    const [formData, setFormData] = useState({
-        petName: '',
-        petSpecies: '',
-        petBreed: '',
-        petGender: '',
-        petBirthDate: '',
-        petMicrochipNr: '',
-        petWeight: ''
-    });
-
-
-    useEffect(() => {
-        if (!initialData) {
-            // ? problem
-            setFormData({
-                petName: '',
-                petSpecies: '',
-                petBreed: '',
-                petGender: '',
-                petBirthDate: '',
-                petMicrochipNr: '',
-                petWeight: ''
-            });
-            return;
-        }
-
+    const [formData, setFormData] = useState(() => ({
+        ...emptyForm,
+        petName: initialData?.petName || '',
+        petSpecies: initialData?.species || '',
+        petBreed: initialData?.breed || '',
+        petGender: initialData?.gender || '',
+        petBirthDate: initialData?.birthDate ? initialData.birthDate.slice(0, 10) : '',
+        petMicrochipNr: initialData?.microchipNr || '',
+        petWeight: initialData?.weight || ''
+    }));
 
        
-        setFormData({
-            petName: initialData.petName || '',
-            petSpecies: initialData.species || '',
-            petBreed: initialData.breed || '',
-            petGender: initialData.gender || '',
-            petBirthDate: initialData.birthDate
-                ? initialData.birthDate.slice(0, 10)
-                : '',
-            petMicrochipNr: initialData.microchipNr || '',
-            petWeight: initialData.weight || ''
-        });
-    }, [initialData]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+        const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+        const handleSubmit = (e) => {
+            e.preventDefault();
 
-        const preparedData = {
-            ...formData,
-            petWeight: formData.petWeight ? parseFloat(formData.petWeight) : null,
-            petBirthDate: formData.petBirthDate || null
-        }
+            const preparedData = {
+                ...formData,
+                petWeight: formData.petWeight ? parseFloat(formData.petWeight) : null,
+                petBirthDate: formData.petBirthDate || null
+            };
 
-        onSubmit(preparedData);
+            onSubmit(preparedData);
 
-    };
+            setFormData(emptyForm);
+        };
 
     return (
         <form onSubmit={handleSubmit} className="mt-4">
@@ -176,7 +158,10 @@ const PetForm = ({ onSubmit, initialData = null, buttonText, onCancel }) => {
                         <button
                             type="button"
                             className="btn btn-outline-secondary"
-                            onClick={onCancel}
+                            onClick={() => {
+                                setFormData(emptyForm);
+                                onCancel();
+                            }}
                         >
                             Cancel
                         </button>

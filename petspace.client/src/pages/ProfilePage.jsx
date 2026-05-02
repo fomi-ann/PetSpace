@@ -15,6 +15,8 @@ const ProfilePage = () => {
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
 
+    const [editingProfile, setEditingProfile] = useState(null);
+
     const fetchPets = async () => {
         try {
             const response = await fetch('/api/pets', {
@@ -172,84 +174,84 @@ const ProfilePage = () => {
     
 
     return (
-        <div className="container mt-5" style={{ maxWidth: '800px' }}>
+        <div className="container mt-5" style={{ maxWidth: '1100px' }}>
             {error && <div className="alert alert-danger">{error}</div>}
 
             {profile && (
-                <div className="row">
-                    <div className="col-12">
-
+                <div className="row g-4">
+                    <div className="col-md-7">
                         <UserIdentityCard
                             profile={profile}
                             config={displayConfig}
                             title={`${role} Profile`}
+                            onEdit={setEditingProfile}
                         />
 
-
-                        <div className="card p-5 mb-4">
-                            <h4 className="text-secondary mb-4 border-bottom pb-2">Update Profile</h4>
-                            <UpdateProfileForm
-                                fields={fieldsConfig}
-                                initialData={{
-                                    firstName: profile.userFirstName || '',
-                                    lastName: profile.userLastName || '',
-                                    phoneNumber: profile.phoneNumber || '',
-                                    clinicName: profile.clinicName || '',
-                                    address: profile.address || '',
-                                    phone: profile.phone || '',
-                                    specialization: profile.specialization || '',
-                                    licence: profile.licence || ''
-                                }}
-                                onSave={handleSave}
-                            />
-                        </div>
-
-
                         {role === 'PetOwner' && (
-                            <div className="card p-5 bg-light">
-
-
+                            <div className="card p-4 bg-light">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 className="text-primary">My Pets</h4>
+                                    <h4 className="text-primary mb-0">My Pets</h4>
+
                                     <a href="/pets" className="btn btn-outline-primary btn-sm">
                                         Manage pets
                                     </a>
                                 </div>
 
-
                                 <hr />
 
                                 {!pets.length && (
-                                    <p className="text-muted">You don't have any pets registered yet.</p>
+                                    <p className="text-muted">
+                                        You don't have any pets registered yet.
+                                    </p>
                                 )}
 
-
                                 {pets.slice(0, 3).map(pet => (
-
-                                    <div key={pet.petId} className="border rounded p-3 mb-2 bg-white text-start">
-
+                                    <div
+                                        key={pet.petId}
+                                        className="border rounded p-3 mb-2 bg-white text-start"
+                                    >
                                         <h5 className="mb-1">{pet.petName}</h5>
 
                                         <p className="mb-1">
                                             <strong>Species:</strong> {pet.species || 'N/A'}
                                         </p>
 
-                                        <p className="mb-0">
-                                            <strong>Weight:</strong> {pet.weight ? `${pet.weight} kg` : 'N/A'}
+                                        <p className="mb-1">
+                                            <strong>Breed:</strong> {pet.breed || 'N/A'}
                                         </p>
 
-
+                                        <p className="mb-0">
+                                            <strong>Weight:</strong>{' '}
+                                            {pet.weight ? `${pet.weight} kg` : 'N/A'}
+                                        </p>
                                     </div>
                                 ))}
-
-
                             </div>
                         )}
+                    </div>
+
+                    <div className="col-md-5">
+                        <div className="card p-4">
+
+                            <h4 className="text-secondary mb-2">
+                                Edit Profile
+                            </h4>
+
+                            <UpdateProfileForm
+                                key={editingProfile ? 'edit-profile' : 'empty-profile'}
+                                fields={fieldsConfig}
+                                initialData={editingProfile}
+                                onSave={async (data) => {
+                                    await handleSave(data);
+                                    setEditingProfile(null);
+                                }}
+                                onCancel={() => setEditingProfile(null)}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
         </div>
-    );
-};
-
+    )
+}
 export default ProfilePage;
