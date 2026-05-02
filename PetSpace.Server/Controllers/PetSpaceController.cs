@@ -275,5 +275,61 @@ namespace PetSpace.Server.Controllers
 
             return Ok();
         }
+
+        [Authorize(Roles = "Vet")]
+        [HttpPost("vet/request-clinic")]
+        public async Task<IActionResult> RequestClinicVerification([FromBody] VetClinicRequestDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var result = await _petSpaceService.RequestClinicVerificationAsync(userGuid, dto.ClinicId);
+
+            if (!result)
+                return BadRequest("Failed to send clinic verification request.");
+
+            return Ok();
+        }
+
+
+
+        [Authorize(Roles = "Clinic")]
+        [HttpGet("clinic/vet-requests")]
+        public async Task<IActionResult> GetClinicVetRequests()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var requests = await _petSpaceService.GetClinicVetRequestsAsync(userGuid);
+
+            return Ok(requests);
+        }
+
+        [Authorize(Roles = "Clinic")]
+        [HttpPut("clinic/vet-requests/{vetId}")]
+        public async Task<IActionResult> UpdateVetVerification(Guid vetId, [FromQuery] bool approve)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+
+            var result = await _petSpaceService.UpdateVetVerificationAsync(userGuid, vetId, approve);
+
+            if (!result)
+                return BadRequest("Failed to update vet verification.");
+
+            return Ok();
+        }
     }
 }

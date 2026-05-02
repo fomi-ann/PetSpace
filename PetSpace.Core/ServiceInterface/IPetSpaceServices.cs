@@ -31,6 +31,10 @@ namespace PetSpace.Core.ServiceInterface
         Task<List<object>> GetPetMedicalRecordsAsync(Guid userId, Guid petId);
 
         Task<bool> SharePetAsync(Guid currentUserId, SharePetDto dto);
+
+        Task<bool> RequestClinicVerificationAsync(Guid vetUserId, Guid clinicId);
+        Task<List<object>> GetClinicVetRequestsAsync(Guid clinicUserId);
+        Task<bool> UpdateVetVerificationAsync(Guid clinicUserId, Guid vetId, bool approve);
     }
 
 }

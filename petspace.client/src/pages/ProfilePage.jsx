@@ -12,6 +12,10 @@ const ProfilePage = () => {
     const [error, setError] = useState('');
     const [pets, setPets] = useState([]);
 
+    const [clinics, setClinics] = useState([]);
+    const [selectedClinicId, setSelectedClinicId] = useState('');
+
+
     const token = localStorage.getItem('token');
     const role = localStorage.getItem('userRole');
 
@@ -57,21 +61,61 @@ const ProfilePage = () => {
             }
         };
 
+
         if (!token) {
             setError('No token found.');
             setLoading(false);
             return;
         }
 
+        const fetchClinics = async () => {
+            try {
+                const response = await fetch('/api/clinics', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setClinics(data);
+                }
+            } catch (err) {
+                console.error('Clinics fetch error:', err);
+            }
+        };
+
         const loadData = async () => {
             await fetchProfile();
             await fetchPets();
+            await fetchClinics();
         };
 
         loadData();
 
     }, [token]);
 
+    const handleRequestClinic = async () => {
+        if (!selectedClinicId) return;
+
+        try {
+            const response = await fetch('/api/vet/request-clinic', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ clinicId: selectedClinicId })
+            });
+
+            if (response.ok) {
+                alert('Request sent');
+                window.location.reload();
+            } else {
+                alert('Failed to send request');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const handleSave = async (updatedData) => {
         try {
@@ -228,10 +272,48 @@ const ProfilePage = () => {
                                 ))}
                             </div>
                         )}
+
+                        
                     </div>
 
                     <div className="col-md-5">
-                        <div className="card p-4">
+
+                        {role === 'Vet' && (
+                            <div className="card p-4">
+                                <h5 className="mb-3">Clinic Verification</h5>
+
+                                <select
+                                    className="form-select mb-3"
+                                    value={selectedClinicId}
+                                    onChange={(e) => setSelectedClinicId(e.target.value)}
+                                >
+                                    <option value="">Select clinic</option>
+                                    {clinics.map(c => (
+                                        <option key={c.clinicId} value={c.clinicId}>
+                                            {c.clinicName}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="d-flex gap-2">
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleRequestClinic}
+                                >
+                                    Send Request
+                                </button>
+
+                                <div className="mt-2">
+                                    {profile.isVerified ? (
+                                        <span className="badge bg-success">Verified</span>
+                                    ) : profile.clinicId ? (
+                                        <span className="badge bg-warning text-dark">Pending</span>
+                                    ) : null}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="card p-4 mt-4">
 
                             <h4 className="text-secondary mb-2">
                                 Edit Profile
@@ -248,9 +330,14 @@ const ProfilePage = () => {
                                 onCancel={() => setEditingProfile(null)}
                             />
                         </div>
+
+                        
+                        
                     </div>
                 </div>
             )}
+
+            
         </div>
     )
 }

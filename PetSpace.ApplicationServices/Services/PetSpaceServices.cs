@@ -573,5 +573,83 @@ namespace PetSpace.ApplicationServices.Services
                 )
             );
         }
+
+        public async Task<bool> RequestClinicVerificationAsync(Guid vetUserId, Guid clinicId)
+        {
+            var vet = await _context.Vets
+                .FirstOrDefaultAsync(v => v.UserId == vetUserId);
+
+            if (vet == null) return false;
+
+            var clinicExists = await _context.Clinics
+                .AnyAsync(c => c.ClinicId == clinicId);
+
+            if (!clinicExists) return false;
+
+            vet.ClinicId = clinicId;
+            vet.IsVerified = false;
+            vet.VerifiedAt = null;
+            vet.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
+        public async Task<List<object>> GetClinicVetRequestsAsync(Guid clinicUserId)
+        {
+            var clinic = await _context.Clinics
+                .FirstOrDefaultAsync(c => c.UserId == clinicUserId);
+
+            if (clinic == null) return new List<object>();
+
+            return await _context.Vets
+                .Include(v => v.User)
+                .Where(v => v.ClinicId == clinic.ClinicId && !v.IsVerified)
+                .Select(v => new
+                {
+                    vetId = v.VetId,
+                    vetName = v.User != null
+                        ? v.User.UserFirstName + " " + v.User.UserLastName
+                        : "Unknown vet",
+                    email = v.User != null ? v.User.Email : "",
+                    specialization = v.VetSpecialization,
+                    licence = v.VetLicence
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateVetVerificationAsync(Guid clinicUserId, Guid vetId, bool approve)
+        {
+            var clinic = await _context.Clinics
+                .FirstOrDefaultAsync(c => c.UserId == clinicUserId);
+
+            if (clinic == null) return false;
+
+            var vet = await _context.Vets
+                .FirstOrDefaultAsync(v => v.VetId == vetId && v.ClinicId == clinic.ClinicId);
+
+            if (vet == null) return false;
+
+            if (approve)
+            {
+                vet.IsVerified = true;
+                vet.VerifiedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                vet.IsVerified = false;
+                vet.VerifiedAt = null;
+                vet.ClinicId = null;
+            }
+
+            vet.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
     }
 }
