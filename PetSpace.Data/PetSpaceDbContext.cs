@@ -38,13 +38,15 @@ namespace PetSpace.Data
             modelBuilder.Entity<PetOwner>()
                 .HasOne(po => po.User)
                 .WithMany(u => u.PetOwners)
-                .HasForeignKey(po => po.UserId);
+                .HasForeignKey(po => po.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            // Future many-to-many
-            // modelBuilder.Entity<PetOwner>()
-            //     .HasOne(po => po.Pet)
-            //     .WithMany(p => p.PetOwners)
-            //     .HasForeignKey(po => po.PetId);
+            // many-to-many
+            modelBuilder.Entity<PetOwner>()
+                .HasOne(po => po.Pet)
+                .WithMany(p => p.PetOwners)
+                .HasForeignKey(po => po.PetId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<RegisteredPatient>()
                 .HasOne(rp => rp.User)

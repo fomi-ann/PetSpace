@@ -24,8 +24,7 @@ namespace PetSpace.Core.Domain
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         
-        // just one owner atm
-        // public virtual ICollection<PetOwner>? PetOwners { get; set; }
+        public virtual ICollection<PetOwner>? PetOwners { get; set; }
         public virtual ICollection<Appointment>? Appointments { get; set; }
         public virtual ICollection<MedicalRecord>? MedicalRecords { get; set; }
     }
