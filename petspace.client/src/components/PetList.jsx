@@ -1,4 +1,6 @@
-const PetList = ({ pets, onDelete, onEdit }) => {
+
+
+const PetList = ({ pets, onDelete, onEdit, onShare }) => {
 
     const getAgeText = (birthDate) => {
         if (!birthDate) return 'N/A';
@@ -68,6 +70,18 @@ const PetList = ({ pets, onDelete, onEdit }) => {
                             >
                                 Delete
                             </button>
+
+
+                            {onShare && (
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={() => onShare(pet.petId)}
+                                >
+                                    Share
+                                </button>
+                            )}
+
                         </div>
                     </div>
 

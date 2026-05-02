@@ -100,6 +100,32 @@ const MyPetsPage = () => {
         }
     };
 
+    const handleSharePet = async (petId) => {
+        const email = prompt('Enter user email to share this pet with:');
+
+        if (!email) return;
+
+        try {
+            const response = await fetch('/api/pets/share', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ petId, email })
+            });
+
+            if (response.ok) {
+                alert('Pet shared successfully.');
+            } else {
+                alert('Failed to share pet.');
+            }
+        } catch (err) {
+            console.error('Share pet error:', err);
+            alert('Could not connect to the server.');
+        }
+    };
+
     return (
         <div className="container mt-5" style={{ maxWidth: '1100px' }}>
             <div className="row">
@@ -113,6 +139,7 @@ const MyPetsPage = () => {
                             pets={pets}
                             onDelete={handleDeletePet}
                             onEdit={setEditingPet}
+                            onShare={handleSharePet}
                         />
                     </div>
                 </div>

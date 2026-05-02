@@ -207,7 +207,10 @@ namespace PetSpace.ApplicationServices.Services
         public async Task<List<object>> GetUserPetsAsync(Guid userId)
         {
             return await _context.Pets
-                .Where(p => p.OwnerId == userId)
+                .Where(p =>
+                    p.OwnerId == userId ||
+                    p.PetOwners.Any(po => po.UserId == userId)
+                    )
                 .Select(p => new
                 {
                     petId = p.PetId,
@@ -242,6 +245,17 @@ namespace PetSpace.ApplicationServices.Services
             };
 
             _context.Pets.Add(pet);
+
+            _context.PetOwners.Add(new PetOwner
+            {
+                PetOwnerId = Guid.NewGuid(),
+                UserId = userId,
+                PetId = pet.PetId,
+                IsPrimaryOwner = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -485,6 +499,35 @@ namespace PetSpace.ApplicationServices.Services
                 })
                 .Cast<object>()
                 .ToListAsync();
+        }
+
+        public async Task<bool> SharePetAsync(Guid currentUserId, SharePetDto dto)
+        {
+            var pet = await _context.Pets
+                .FirstOrDefaultAsync(p => p.PetId == dto.PetId && p.OwnerId == currentUserId);
+
+            if (pet == null) return false;
+
+            var invitedUser = await _userManager.FindByEmailAsync(dto.Email);
+            if (invitedUser == null) return false;
+
+            var alreadyShared = await _context.PetOwners
+                .AnyAsync(po => po.PetId == dto.PetId && po.UserId == invitedUser.Id);
+
+            if (alreadyShared) return false;
+
+            _context.PetOwners.Add(new PetOwner
+            {
+                PetOwnerId = Guid.NewGuid(),
+                PetId = dto.PetId,
+                UserId = invitedUser.Id,
+                IsPrimaryOwner = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

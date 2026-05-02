@@ -258,5 +258,22 @@ namespace PetSpace.Server.Controllers
 
             return Ok(records);
         }
+
+        [Authorize(Roles = "PetOwner")]
+        [HttpPost("pets/share")]
+        public async Task<IActionResult> SharePet([FromBody] SharePetDto dto)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var result = await _petSpaceService.SharePetAsync(userGuid, dto);
+
+            if (!result)
+                return BadRequest("Failed to share pet.");
+
+            return Ok();
+        }
     }
 }
