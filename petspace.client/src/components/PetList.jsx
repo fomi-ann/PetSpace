@@ -53,37 +53,42 @@ const PetList = ({ pets, onDelete, onEdit, onShare }) => {
                                 <i>{pet.microchipNr || 'N/A'}</i>
                             </p>
                         </div>
-
                         <div className="d-flex gap-2">
-                            <button
-                                type="button"
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={() => onEdit(pet)}
-                            >
-                                Edit
-                            </button>
+                            {pet.isPrimaryOwner ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={() => onEdit(pet)}
+                                    >
+                                        Edit
+                                    </button>
 
-                            <button
-                                type="button"
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => onDelete(pet.petId)}
-                            >
-                                Delete
-                            </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => onDelete(pet.petId)}
+                                    >
+                                        Delete
+                                    </button>
 
-
-                            {onShare && (
-                                <button
-                                    type="button"
-                                    className="btn btn-outline-secondary btn-sm"
-                                    onClick={() => onShare(pet.petId)}
-                                >
-                                    Share
-                                </button>
-                            )}
-
+                                    {onShare && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary btn-sm"
+                                            onClick={() => onShare(pet.petId)}
+                                        >
+                                            Share
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="badge bg-light text-secondary border">
+                                    Shared
+                                </span>
+                                )}
                         </div>
-                    </div>
+                </div>
 
                     <hr />
 

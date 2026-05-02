@@ -220,7 +220,9 @@ namespace PetSpace.ApplicationServices.Services
                     gender = p.PetGender,
                     birthDate = p.PetBirthDate,
                     microchipNr = p.PetMicrochipNr,
-                    weight = p.PetWeight
+                    weight = p.PetWeight,
+
+                    isPrimaryOwner = p.OwnerId == userId
                 })
                 .Cast<object>()
                 .ToListAsync();
@@ -288,6 +290,21 @@ namespace PetSpace.ApplicationServices.Services
 
             if (pet == null) return false;
 
+            var hasAppointments = await _context.Appointments
+                .AnyAsync(a => a.PetId == petId);
+
+            var hasMedicalRecords = await _context.MedicalRecords
+                .AnyAsync(mr => mr.PetId == petId);
+
+            if (hasAppointments || hasMedicalRecords)
+                return false;
+
+            var petOwners = await _context.PetOwners
+                .Where(po => po.PetId == petId)
+                .ToListAsync();
+
+            _context.PetOwners.RemoveRange(petOwners);
+
             _context.Pets.Remove(pet);
             await _context.SaveChangesAsync();
             return true;
@@ -295,10 +312,14 @@ namespace PetSpace.ApplicationServices.Services
 
         public async Task<bool> CreateAppointmentAsync(Guid userId, CreateAppointmentDto dto)
         {
-            var pet = await _context.Pets
-                .FirstOrDefaultAsync(p => p.PetId == dto.PetId && p.OwnerId == userId);
+            //var pet = await _context.Pets
+            //    .FirstOrDefaultAsync(p => p.PetId == dto.PetId && p.OwnerId == userId);
 
-            if (pet == null) return false;
+            //if (pet == null) return false;
+
+            var hasAccess = await UserHasPetAccessAsync(userId, dto.PetId);
+
+            if (!hasAccess) return false;
 
             var vet = await _context.Vets.FirstOrDefaultAsync(v => v.VetId == dto.VetId);
             if (vet == null) return false;
@@ -333,7 +354,14 @@ namespace PetSpace.ApplicationServices.Services
                     .ThenInclude(v => v.User)
                 .Include(a => a.Clinic)
                 .Include(a => a.Status)
-                .Where(a => a.Pet != null && a.Pet.OwnerId == userId)
+                //.Where(a => a.Pet != null && a.Pet.OwnerId == userId)
+                .Where(a =>
+                    a.Pet != null &&
+                    (
+                        a.Pet.OwnerId == userId ||
+                        a.Pet.PetOwners.Any(po => po.UserId == userId)
+                    )
+)
                 .OrderByDescending(a => a.AppDateTime)
                 .Select(a => new
                 {
@@ -463,10 +491,15 @@ namespace PetSpace.ApplicationServices.Services
 
         public async Task<List<object>> GetPetMedicalRecordsAsync(Guid userId, Guid petId)
         {
-            var pet = await _context.Pets
-                .FirstOrDefaultAsync(p => p.PetId == petId && p.OwnerId == userId);
+            //var pet = await _context.Pets
+            //    .FirstOrDefaultAsync(p => p.PetId == petId && p.OwnerId == userId);
 
-            if (pet == null)
+            //if (pet == null)
+            //    return new List<object>();
+
+            var hasAccess = await UserHasPetAccessAsync(userId, petId);
+
+            if (!hasAccess)
                 return new List<object>();
 
             return await _context.MedicalRecords
@@ -528,6 +561,17 @@ namespace PetSpace.ApplicationServices.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private async Task<bool> UserHasPetAccessAsync(Guid userId, Guid petId)
+        {
+            return await _context.Pets.AnyAsync(p =>
+                p.PetId == petId &&
+                (
+                    p.OwnerId == userId ||
+                    p.PetOwners.Any(po => po.UserId == userId)
+                )
+            );
         }
     }
 }
