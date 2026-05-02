@@ -178,79 +178,82 @@ const VetAppointmentsPage = () => {
 
                         </div>
 
+
+                        {selectedAppointment && (
+                            <div className="card p-4 mt-4 bg-light text-start">
+                                <h4 className="mb-3">Add Medical Record</h4>
+
+                                <p className="text-muted small">
+                                    Pet: <strong>{selectedAppointment.petName}</strong>
+                                </p>
+
+                                <form onSubmit={handleCreateMedicalRecord}>
+                                    <div className="mb-3">
+                                        <label className="form-label">Diagnosis</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={diagnosis}
+                                            onChange={(e) => setDiagnosis(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Treatment Plan</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="3"
+                                            value={treatmentPlan}
+                                            onChange={(e) => setTreatmentPlan(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Pet Weight (kg)</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            className="form-control"
+                                            value={petWeight}
+                                            onChange={(e) => setPetWeight(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label">Comment</label>
+                                        <textarea
+                                            className="form-control"
+                                            rows="3"
+                                            value={comment}
+                                            onChange={(e) => setComment(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="d-flex gap-2">
+                                        <button type="submit" className="btn btn-primary">
+                                            Save Record
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            onClick={() => setSelectedAppointment(null)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
                     </div>
 
                 ))}
 
 
-                {selectedAppointment && (
-                    <div className="card p-4 mt-4 bg-light text-start">
-                        <h4 className="mb-3">Add Medical Record</h4>
-
-                        <p className="text-muted small">
-                            Pet: <strong>{selectedAppointment.petName}</strong>
-                        </p>
-
-                        <form onSubmit={handleCreateMedicalRecord}>
-                            <div className="mb-3">
-                                <label className="form-label">Diagnosis</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={diagnosis}
-                                    onChange={(e) => setDiagnosis(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="mb-3">
-                                <label className="form-label">Treatment Plan</label>
-                                <textarea
-                                    className="form-control"
-                                    rows="3"
-                                    value={treatmentPlan}
-                                    onChange={(e) => setTreatmentPlan(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="mb-3">
-                                <label className="form-label">Pet Weight (kg)</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    className="form-control"
-                                    value={petWeight}
-                                    onChange={(e) => setPetWeight(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="mb-3">
-                                <label className="form-label">Comment</label>
-                                <textarea
-                                    className="form-control"
-                                    rows="3"
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="d-flex gap-2">
-                                <button type="submit" className="btn btn-primary">
-                                    Save Record
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="btn btn-outline-secondary"
-                                    onClick={() => setSelectedAppointment(null)}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
+                
 
             </div>
 
