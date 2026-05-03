@@ -333,10 +333,11 @@ const ProfilePage = () => {
                         )}
                     </div>
 
-                    <div className="col-md-5 d-grid gap-4">
+                    <div className="col-md-5">
+                        <div className="d-grid gap-4">
 
                         {role === 'Vet' && (
-                            <div className="card p-4  md-4">
+                            <div className="card p-4">
                                 <h5 className="mb-3">Clinic Verification</h5>
 
                                 <select
@@ -383,7 +384,7 @@ const ProfilePage = () => {
                             />
                         </div>
 
-                        
+                        </div>
                         
                     </div>
                 </div>
