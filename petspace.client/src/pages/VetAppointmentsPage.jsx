@@ -102,6 +102,22 @@ const VetAppointmentsPage = () => {
         }
     };
 
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'Pending':
+                return 'badge bg-warning text-dark';
+            case 'Approved':
+                return 'badge bg-success';
+            case 'Rejected':
+                return 'badge bg-danger';
+            case 'Completed':
+                return 'badge bg-secondary';
+            default:
+                return 'badge bg-light text-dark border';
+        }
+    };
+
     return (
         <div className="container mt-5" style={{ maxWidth: '900px' }}>
 
@@ -117,57 +133,65 @@ const VetAppointmentsPage = () => {
 
                 {appointments.map(app => (
 
-
                     <div key={app.appId} className="card mb-3 p-3 text-start">
-                        <h5 className="mb-2">{app.petName || 'Unknown pet'}</h5>
 
-                        <p className="mb-1">
-                            <strong>Date:</strong>{' '}
-                            {app.appDateTime ? new Date(app.appDateTime).toLocaleString() : 'N/A'}
-                        </p>
+                        <div className="d-flex justify-content-between align-items-start">
 
-                        <p className="mb-1">
-                            <strong>Clinic:</strong> {app.clinicName || 'N/A'}
-                        </p>
+                            <div>
+                                <h5 className="mb-2">{app.petName || 'Unknown pet'}</h5>
 
-                        <p className="mb-1">
-                            <strong>Reason:</strong> {app.appReason || 'N/A'}
-                        </p>
+                                <p className="mb-1">
+                                    <strong>Date:</strong>{' '}
+                                    {app.appDateTime
+                                        ? new Date(app.appDateTime).toLocaleString()
+                                        : 'N/A'}
+                                </p>
 
-                        <p className="mb-2">
-                            <strong>Status:</strong> {app.status || 'N/A'}
-                        </p>
+                                <p className="mb-1">
+                                    <strong>Clinic:</strong> {app.clinicName || 'N/A'}
+                                </p>
 
+                                <p className="mb-1">
+                                    <strong>Reason:</strong> {app.appReason || 'N/A'}
+                                </p>
+                            </div>
 
-                        <div className="d-flex gap-2">
+                            <span className={getStatusClass(app.status)}>
+                                {app.status || 'N/A'}
+                            </span>
 
-                            <button
-                                type="button"
-                                className="btn btn-success btn-sm"
-                                onClick={() => updateStatus(app.appId, 2)}
-                            >
-                                Approve
-                            </button>
+                        </div>
+                        <div className="d-flex gap-2 mt-3">
 
-                            <button
-                                type="button"
-                                className="btn btn-danger btn-sm"
-                                onClick={() => updateStatus(app.appId, 3)}
-                            >
-                                Reject
-                            </button>
+                            {app.status !== 'Approved' && (
+                                <button
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => updateStatus(app.appId, 2)}
+                                >
+                                    Approve
+                                </button>
+                            )}
 
-                            <button
-                                type="button"
-                                className="btn btn-outline-secondary btn-sm"
-                                onClick={() => updateStatus(app.appId, 4)}
-                            >
-                                Complete
-                            </button>
+                            {app.status !== 'Rejected' && (
+                                <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => updateStatus(app.appId, 3)}
+                                >
+                                    Reject
+                                </button>
+                            )}
+
+                            {app.status !== 'Completed' && (
+                                <button
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={() => updateStatus(app.appId, 4)}
+                                >
+                                    Complete
+                                </button>
+                            )}
 
                             {app.status === 'Completed' && (
                                 <button
-                                    type="button"
                                     className="btn btn-outline-primary btn-sm"
                                     onClick={() => setSelectedAppointment(app)}
                                 >
@@ -175,16 +199,15 @@ const VetAppointmentsPage = () => {
                                 </button>
                             )}
 
-
                         </div>
 
-
-                        {selectedAppointment && (
+                        {selectedAppointment?.appId === app.appId && (
                             <div className="card p-4 mt-4 bg-light text-start">
+
                                 <h4 className="mb-3">Add Medical Record</h4>
 
                                 <p className="text-muted small">
-                                    Pet: <strong>{selectedAppointment.petName}</strong>
+                                    Pet: <strong>{app.petName}</strong>
                                 </p>
 
                                 <form onSubmit={handleCreateMedicalRecord}>
@@ -249,15 +272,9 @@ const VetAppointmentsPage = () => {
                         )}
 
                     </div>
-
                 ))}
 
-
-                
-
             </div>
-
-
         </div>
     );
 };

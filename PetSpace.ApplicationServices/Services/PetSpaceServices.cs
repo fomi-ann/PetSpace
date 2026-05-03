@@ -368,10 +368,17 @@ namespace PetSpace.ApplicationServices.Services
                         a.Pet.PetOwners.Any(po => po.UserId == userId)
                     )
 )
-                .OrderByDescending(a => a.AppDateTime)
+                .OrderBy(a =>
+                        a.AppStatusCodeId == 1 ? 0 :
+                        a.AppStatusCodeId == 2 ? 1 :
+                        a.AppStatusCodeId == 4 ? 2 :
+                        3
+                    )
+                    .ThenByDescending(a => a.AppDateTime)
                 .Select(a => new
                 {
                     appId = a.AppId,
+                    appStatusCodeId = a.AppStatusCodeId,
                     appDateTime = a.AppDateTime,
                     appReason = a.AppReason,
                     status = a.Status != null ? a.Status.AppStatusCode : "",
@@ -395,10 +402,17 @@ namespace PetSpace.ApplicationServices.Services
                 .Include(a => a.Clinic)
                 .Include(a => a.Status)
                 .Where(a => a.VetId == vet.VetId)
-                .OrderByDescending(a => a.AppDateTime)
+                .OrderBy(a =>
+                        a.AppStatusCodeId == 1 ? 0 :
+                        a.AppStatusCodeId == 2 ? 1 :
+                        a.AppStatusCodeId == 4 ? 2 :
+                        3
+                    )
+                .ThenByDescending(a => a.AppDateTime)
                 .Select(a => new
                 {
                     appId = a.AppId,
+                    appStatusCodeId = a.AppStatusCodeId,
                     appDateTime = a.AppDateTime,
                     appReason = a.AppReason,
                     status = a.Status != null ? a.Status.AppStatusCode : "",
