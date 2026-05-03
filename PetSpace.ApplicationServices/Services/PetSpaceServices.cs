@@ -424,6 +424,41 @@ namespace PetSpace.ApplicationServices.Services
                 .ToListAsync();
         }
 
+        public async Task<List<object>> GetVetPetMedicalRecordsAsync(Guid vetUserId, Guid petId)
+        {
+            var vet = await _context.Vets.FirstOrDefaultAsync(v => v.UserId == vetUserId);
+            if (vet == null) return new List<object>();
+
+            var hasAccess = await _context.Appointments
+                .AnyAsync(a => a.PetId == petId && a.VetId == vet.VetId);
+
+            if (!hasAccess) return new List<object>();
+
+            return await _context.MedicalRecords
+                .Include(mr => mr.Appointment)
+                    .ThenInclude(a => a.Clinic)
+                .Include(mr => mr.Vet)
+                    .ThenInclude(v => v.User)
+                .Where(mr => mr.PetId == petId)
+                .OrderByDescending(mr => mr.CreatedAt)
+                .Select(mr => new
+                {
+                    medicalRecordId = mr.MedicalRecordId,
+                    diagnosis = mr.Diagnosis,
+                    treatmentPlan = mr.TreatmentPlan,
+                    petWeight = mr.PetWeight,
+                    comment = mr.Comment,
+                    createdAt = mr.CreatedAt,
+                    appointmentDate = mr.Appointment != null ? mr.Appointment.AppDateTime : (DateTime?)null,
+                    clinicName = mr.Appointment != null && mr.Appointment.Clinic != null ? mr.Appointment.Clinic.ClinicName : "",
+                    vetName = mr.Vet != null && mr.Vet.User != null
+                        ? mr.Vet.User.UserFirstName + " " + mr.Vet.User.UserLastName
+                        : ""
+                })
+                .Cast<object>()
+                .ToListAsync();
+        }
+
         public async Task<bool> UpdateAppointmentStatusAsync(Guid appointmentId, int statusCodeId)
         {
             var appointment = await _context.Appointments.FirstOrDefaultAsync(a => a.AppId == appointmentId);

@@ -7,6 +7,8 @@ const VetAppointmentsPage = () => {
     const [error, setError] = useState('');
 
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [historyPetId, setHistoryPetId] = useState(null);
+    const [medicalRecords, setMedicalRecords] = useState([]);
 
     const [diagnosis, setDiagnosis] = useState('');
     const [treatmentPlan, setTreatmentPlan] = useState('');
@@ -118,6 +120,30 @@ const VetAppointmentsPage = () => {
         }
     };
 
+    const handleViewHistory = async (petId) => {
+        if (historyPetId === petId) {
+            setHistoryPetId(null);
+            setMedicalRecords([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/vet/pets/${petId}/medical-records`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setMedicalRecords(data);
+                setHistoryPetId(petId);
+            } else {
+                alert('Failed to load medical history.');
+            }
+        } catch (err) {
+            console.error('Medical history fetch error:', err);
+        }
+    };
+
     return (
         <div className="container mt-5" style={{ maxWidth: '900px' }}>
 
@@ -163,25 +189,25 @@ const VetAppointmentsPage = () => {
                         </div>
                         <div className="d-flex gap-2 mt-3">
 
-                            {app.status !== 'Approved' && (
-                                <button
-                                    className="btn btn-success btn-sm"
-                                    onClick={() => updateStatus(app.appId, 2)}
-                                >
-                                    Approve
-                                </button>
+                            {app.status === 'Pending' && (
+                                <>
+                                    <button
+                                        className="btn btn-success btn-sm"
+                                        onClick={() => updateStatus(app.appId, 2)}
+                                    >
+                                        Approve
+                                    </button>
+
+                                    <button
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => updateStatus(app.appId, 3)}
+                                    >
+                                        Reject
+                                    </button>
+                                </>
                             )}
 
-                            {app.status !== 'Rejected' && (
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => updateStatus(app.appId, 3)}
-                                >
-                                    Reject
-                                </button>
-                            )}
-
-                            {app.status !== 'Completed' && (
+                            {app.status === 'Approved' && (
                                 <button
                                     className="btn btn-outline-secondary btn-sm"
                                     onClick={() => updateStatus(app.appId, 4)}
@@ -199,7 +225,58 @@ const VetAppointmentsPage = () => {
                                 </button>
                             )}
 
+                            <button
+                                className="btn btn-outline-secondary btn-sm"
+                                onClick={() => handleViewHistory(app.petId)}
+                            >
+                                View History
+                            </button>
+
                         </div>
+
+                        {historyPetId === app.petId && (
+                            <div className="card p-4 mt-4 bg-light text-start">
+                                <h4 className="mb-3">Health History</h4>
+
+                                {!medicalRecords.length && (
+                                    <p className="text-muted mb-0">No medical records found.</p>
+                                )}
+
+                                {medicalRecords.map(record => (
+                                    <div key={record.medicalRecordId} className="border rounded p-3 mb-2 bg-white">
+                                        <h6 className="mb-2">{record.diagnosis || 'Medical Record'}</h6>
+
+                                        <p className="mb-1">
+                                            <strong>Date:</strong>{' '}
+                                            {record.appointmentDate
+                                                ? new Date(record.appointmentDate).toLocaleString()
+                                                : 'N/A'}
+                                        </p>
+
+                                        <p className="mb-1">
+                                            <strong>Clinic:</strong> {record.clinicName || 'N/A'}
+                                        </p>
+
+                                        <p className="mb-1">
+                                            <strong>Veterinarian:</strong> {record.vetName || 'N/A'}
+                                        </p>
+
+                                        <p className="mb-1">
+                                            <strong>Treatment:</strong> {record.treatmentPlan || 'N/A'}
+                                        </p>
+
+                                        <p className="mb-1">
+                                            <strong>Weight:</strong>{' '}
+                                            {record.petWeight ? `${record.petWeight} kg` : 'N/A'}
+                                        </p>
+
+                                        <p className="mb-0">
+                                            <strong>Comment:</strong> {record.comment || 'N/A'}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {selectedAppointment?.appId === app.appId && (
                             <div className="card p-4 mt-4 bg-light text-start">

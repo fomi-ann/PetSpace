@@ -196,6 +196,20 @@ namespace PetSpace.Server.Controllers
 
         }
 
+        [Authorize(Roles = "Vet")]
+        [HttpGet("vet/pets/{petId}/medical-records")]
+        public async Task<IActionResult> GetVetPetMedicalRecords(Guid petId)
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized();
+
+            var userGuid = Guid.Parse(userIdClaim);
+            var records = await _petSpaceService.GetVetPetMedicalRecordsAsync(userGuid, petId);
+
+            return Ok(records);
+        }
+
 
         [Authorize]
         [HttpPut("appointments/{appointmentId}/status")]
