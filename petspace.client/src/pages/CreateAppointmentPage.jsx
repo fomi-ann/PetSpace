@@ -10,10 +10,15 @@ const CreateAppointmentPage = () => {
     const [formData, setFormData] = useState({
         petId: '',
         vetId: '',
+        isVerified: '',
         clinicId: '',
         appDateTime: '',
         appReason: ''
     });
+
+    const filteredVets = formData.clinicId
+        ? vets.filter(vet => vet.clinicId === formData.clinicId && vet.isVerified)
+        : [];
 
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -73,7 +78,8 @@ const CreateAppointmentPage = () => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            ...(name === 'clinicId' ? { vetId: '' } : {})
         }));
     };
 
@@ -174,11 +180,14 @@ const CreateAppointmentPage = () => {
                                 className="form-control"
                                 value={formData.vetId}
                                 onChange={handleChange}
-                                required>     
-                                
-                                
-                                <option value="">Select veterinarian</option>
-                                {vets.map(vet => (
+                                required
+                                disabled={!formData.clinicId}
+                            >
+                                <option value="">
+                                    {formData.clinicId ? 'Select veterinarian' : 'Select clinic first'}
+                                </option>
+
+                                {filteredVets.map(vet => (
                                     <option key={vet.vetId} value={vet.vetId}>
                                         {vet.vetName}
                                     </option>

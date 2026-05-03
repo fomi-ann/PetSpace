@@ -428,6 +428,7 @@ namespace PetSpace.ApplicationServices.Services
             return await _context.Vets
                 .Include(v => v.User)
                 .Include(v => v.Clinic)
+                .Where(v => v.IsVerified)
                 .Select(v => new
                 {
                     vetId = v.VetId,
@@ -438,7 +439,9 @@ namespace PetSpace.ApplicationServices.Services
 
                     clinicId = v.ClinicId,
                     clinicName = v.Clinic != null ? v.Clinic.ClinicName : "",
-                    specialization = v.VetSpecialization
+                    specialization = v.VetSpecialization,
+                    licence = v.VetLicence,
+                    isVerified = v.IsVerified
                 })
                 .Cast<object>()
                 .ToListAsync();
